@@ -49,13 +49,15 @@ pokemon_randomizer.Randomize = function ()
             -- Shuffles pokemon typing (1&2)
             if data.options.pokemon.typing.enabled and data.randomizationChance(options.typing.randomizationChance, 'pokemon.stats') then
                 local firstTypeId = data.random('pokemon.stats', 1, #typeList);
-                form.Element1 = {from = currentForm.Element1};
-                
-                currentForm.Element1 = typeList[firstTypeId];
-                form.Element1.to = currentForm.Element1;
 
-                if not data.options.pokemon.typing.naturalDualTyping then
-                    if not data.options.pokemon.typing.allowDuplicateTyping then
+                if options.typing.typeRetainment ~= 1 then
+                    form.Element1 = {from = currentForm.Element1};
+                    currentForm.Element1 = typeList[firstTypeId];
+                    form.Element1.to = currentForm.Element1;
+                end
+
+                if options.typing.typeRetainment ~= 2 then
+                    if options.typing.typeRetainment ~= 1 and not data.options.pokemon.typing.allowDuplicateTyping then
                         table.remove(typeList, firstTypeId);
                     end
                     --- Randomize second type
@@ -75,7 +77,7 @@ pokemon_randomizer.Randomize = function ()
                             form.Element2.to = 'none';
                         end
                     end
-                    if not data.options.pokemon.typing.allowDuplicateTyping then
+                    if options.typing.typeRetainment ~= 1 and not data.options.pokemon.typing.allowDuplicateTyping then
                         table.insert(typeList, firstTypeId, currentForm.Element1);
                     end
                 end

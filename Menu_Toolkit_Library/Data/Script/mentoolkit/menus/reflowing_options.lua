@@ -2,10 +2,6 @@ local CONST = require 'mentoolkit.lib.constants'
     local Dir8 = CONST.Enums.Dir8;
     local DirH = CONST.Enums.DirH;
 
-local logger = require 'mentoolkit.lib.logger' ('mentoolkit', 'Menu Toolkit')
-for i,k in pairs(io) do logger:debug("io.".. i) end
-logger:debug(_VERSION)
-
 ---@class mentoolkit.Options
 ---@field onInput fun(menu: mentoolkit.Options,input: unknown): boolean Input Event. Return value cancels the default inputs (besides menu close).
 local options_menu = {
@@ -39,7 +35,7 @@ function options_menu:Rebuild()
     local y = 8;
     if self.title then
         self.__menuElements:Add(CONST.Functions.Menu.CreateText(self.title, 10, 8));
-        self.__menuElements:Add(CONST.Methods.Menu.Elements.Divider(RogueElements.Loc(10,21), mw- 20));
+        self.__menuElements:Add(RogueEssence.Menu.MenuDivider(RogueElements.Loc(10,21), mw- 20));
         y = y + 15;
     end
 

@@ -50,7 +50,10 @@ local data = {
                 --- Only allow pokemon to be dual-typed if they already have a second type.
                 retainDualTyping = false,
                 --- Keep the second type as the pokemon's original second type.
-                naturalDualTyping = false,
+                naturalSecondType = false,
+                --- Controls whether a Pokemon keeps its first type, second type, or neither.
+                ---@type false|1|2
+                typeRetainment = false,
                 --- Allow same first and second types.
                 allowDuplicateTyping = false,
                 --- Random chance to change the second type.<br>
@@ -64,7 +67,6 @@ local data = {
                 randomizationChance = 1,
                 guaranteedStartingMoves = 4,
                 enforceStartingAttackingMove = true,
-                --- todo: not implemented yet
                 ensuredAttackingMoves = 2,
                 learnset = {
                     shuffleExisting = false,
@@ -208,7 +210,10 @@ end
 
 data.language = {};
 data.language.toggle = function (bool)
-    return bool and STRINGS:FormatKey("RANDOMIZER_OPTION_ENABLED") or STRINGS:FormatKey("RANDOMIZER_OPTION_DISABLED");
+    return bool and STRINGS:FormatKey("pmdorand:option.enabled") or STRINGS:FormatKey("pmdorand:option.disabled");
+end
+data.language.descriptionText = function (key)
+    return STRINGS:FormatKey(key ..".title"), (STRINGS:FormatKey(key ..".description"):gsub("%[br%]",'\n'))
 end
 
 return data;

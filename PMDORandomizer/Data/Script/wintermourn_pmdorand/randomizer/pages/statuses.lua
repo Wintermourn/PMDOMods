@@ -11,7 +11,7 @@ return function()
         statuses_menu = options_menu(16,40,220,76);
         statuses_menu.title = "Statuses"
 
-        statuses_menu:AddButton("Randomization", CONST.FUNCTION_EMPTY).labels.right = STRINGS:FormatKey("RANDOMIZER_OPTION_DISABLED");
+        statuses_menu:AddButton("Randomization", CONST.FUNCTION_EMPTY).labels.right = STRINGS:FormatKey("pmdorand:option.disabled");
         buttons.duration = statuses_menu:AddSubmenuButton("Duration", CONST.FUNCTION_EMPTY);
         buttons.potency = statuses_menu:AddSubmenuButton("Potency", CONST.FUNCTION_EMPTY);
     end

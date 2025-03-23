@@ -11,7 +11,7 @@ return function()
         naming_menu = options_menu(16,40,220,102);
         naming_menu.title = "Naming"
 
-        naming_menu:AddButton("Randomization", CONST.FUNCTION_EMPTY).labels.right = STRINGS:FormatKey("RANDOMIZER_OPTION_DISABLED");
+        naming_menu:AddButton("Randomization", CONST.FUNCTION_EMPTY).labels.right = STRINGS:FormatKey("pmdorand:option.disabled");
         buttons.pokemon = naming_menu:AddSubmenuButton("Pokemon", CONST.FUNCTION_EMPTY);
         buttons.items = naming_menu:AddSubmenuButton("Items", CONST.FUNCTION_EMPTY);
         buttons.moves = naming_menu:AddSubmenuButton("Moves", CONST.FUNCTION_EMPTY);

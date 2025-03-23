@@ -1,0 +1,73 @@
+local options_menu = require 'mentoolkit.menus.reflowing_options'
+local paginated_options = require 'mentoolkit.menus.paginated_options'
+local data = require 'wintermourn_pmdorand.randomizer.data'
+local menu = paginated_options(24, 56, 220, 115);
+menu.title = "Pokemon > Typing";
+menu:AddDescriptionPanel(0,185,320,55);
+
+local frontPage = menu:AddPage();
+
+frontPage:AddButton("Randomization", function (self)
+    data.options.pokemon.typing.enabled = not data.options.pokemon.typing.enabled;
+    self:SetLabel('right', data.language.toggle(data.options.pokemon.typing.enabled));
+end):SetCallback('onRefresh', function (self)
+    self:SetLabel('right', data.language.toggle(data.options.pokemon.typing.enabled));
+end):SetDescription(data.language.descriptionText("pmdorand:pkmn.typing.rand")):CalculateHeight();
+
+frontPage:AddHeader("[color=#aaaaaa]Dual Typing");
+
+frontPage:AddButton("Allow Duplicates", function (self)
+    data.options.pokemon.typing.allowDuplicateTyping = not data.options.pokemon.typing.allowDuplicateTyping;
+    self:SetLabel('right', data.language.toggle(data.options.pokemon.typing.allowDuplicateTyping));
+end):SetCallback('onRefresh', function (self)
+    self:SetLabel('right', data.language.toggle(data.options.pokemon.typing.allowDuplicateTyping));
+end):SetDescription(data.language.descriptionText("pmdorand:pkmn.typing.duplicates")):CalculateHeight();
+
+frontPage:AddButton("Keep Dual Typing", function (self)
+    data.options.pokemon.typing.retainDualTyping = not data.options.pokemon.typing.retainDualTyping;
+    self:SetLabel('right', data.language.toggle(data.options.pokemon.typing.retainDualTyping));
+end):SetCallback('onRefresh', function (self)
+    self:SetLabel('right', data.language.toggle(data.options.pokemon.typing.retainDualTyping));
+end):SetDescription(data.language.descriptionText("pmdorand:pkmn.typing.retainDual")):CalculateHeight();
+
+frontPage:AddButton("Type Retainment", function (self)
+    local value = data.options.pokemon.typing.typeRetainment;
+    if value == 1 then value = 2 elseif value == 2 then value = false else value = 1 end
+    data.options.pokemon.typing.typeRetainment = value;
+    self:SetLabel('right', STRINGS:FormatKey("pmdorand:option.".. (value == 1 and 'first' or (value == 2 and 'second') or 'disabled')));
+end):SetCallback('onRefresh', function (self)
+    local value = data.options.pokemon.typing.typeRetainment;
+    self:SetLabel('right', STRINGS:FormatKey("pmdorand:option.".. (value == 1 and 'first' or (value == 2 and 'second') or 'disabled')));
+end):SetDescription(data.language.descriptionText("pmdorand:pkmn.typing.retainment")):CalculateHeight();
+
+--[[ local menu = options_menu(24,56,220,115);
+menu.title = "Typing";
+
+--- ! TODO: Descriptive Menu
+
+menu:AddButton("Randomization", function (self)
+    data.options.pokemon.typing.enabled = not data.options.pokemon.typing.enabled;
+    self.labels.right = data.language.toggle(data.options.pokemon.typing.enabled);
+    self.menuElements.right:SetText(self.labels.right);
+end).labels.right = data.language.toggle(data.options.pokemon.typing.enabled);
+menu:AddSpacer(4)
+menu:AddHeader("Dual Typing")
+menu:AddButton("Allow Duplicates", function (self)
+    data.options.pokemon.typing.allowDuplicateTyping = not data.options.pokemon.typing.allowDuplicateTyping;
+    self.labels.right = data.language.toggle(data.options.pokemon.typing.allowDuplicateTyping);
+    self.menuElements.right:SetText(self.labels.right);
+end).labels.right = data.language.toggle(data.options.pokemon.typing.allowDuplicateTyping);
+menu:AddButton("Retain Dual Typing", function (self)
+    data.options.pokemon.typing.retainDualTyping = not data.options.pokemon.typing.retainDualTyping;
+    self.labels.right = data.language.toggle(data.options.pokemon.typing.retainDualTyping);
+    self.menuElements.right:SetText(self.labels.right);
+end).labels.right = data.language.toggle(data.options.pokemon.typing.retainDualTyping);
+menu:AddButton("Keep Second Type", function (self)
+    data.options.pokemon.typing.naturalSecondType = not data.options.pokemon.typing.naturalSecondType;
+    self.labels.right = data.language.toggle(data.options.pokemon.typing.naturalSecondType);
+    self.menuElements.right:SetText(self.labels.right);
+end).labels.right = data.language.toggle(data.options.pokemon.typing.naturalSecondType); ]]
+
+return function ()
+    menu:Open(true);
+end;

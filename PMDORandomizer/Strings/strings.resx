@@ -102,15 +102,53 @@
     <value>[color=#777777]Press `DELETE` to clear the selected seed.</value>
     <comment></comment>  
   </data>
-  <data name="RANDOMIZER_OPTION_ENABLED" xml:space="preserve">
+  <data name="pmdorand:option.enabled" xml:space="preserve">
     <value>[color=#90baff]Enabled</value>
   </data>
-  <data name="RANDOMIZER_OPTION_DISABLED" xml:space="preserve">
+  <data name="pmdorand:option.first" xml:space="preserve">
+    <value>[color=#ffbb90]First</value>
+  </data>
+  <data name="pmdorand:option.second" xml:space="preserve">
+    <value>[color=#ffbb90]Second</value>
+  </data>
+  <data name="pmdorand:option.disabled" xml:space="preserve">
     <value>[color=#ff9090]Disabled</value>
   </data>
   <data name="RANDOMIZER_CLEAR_FILES" xml:space="preserve">
     <value>This will clear every modified file from the randomizer, returning everything to normal.[br]Your current save will likely not play correctly after this.[pause=0] Continue?</value>
     <comment>Label of the Status Effects menu option.</comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.rand.title" xml:space="preserve">
+    <value>Type Randomization</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.rand.description" xml:space="preserve">
+    <value>Toggles randomization for Pokemon types.[br]Disable to keep Pokemon types as they should be.</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.duplicates.title" xml:space="preserve">
+    <value>Duplicate Typing</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.duplicates.description" xml:space="preserve">
+    <value>Allows a Pokemon's first and second type to be identical.</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.retainDual.title" xml:space="preserve">
+    <value>Retain Dual Typings</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.retainDual.description" xml:space="preserve">
+    <value>Makes Pokemon keep the same amount of types that they originally had.</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.retainment.title" xml:space="preserve">
+    <value>Type Retainment</value>
+    <comment></comment>  
+  </data>
+  <data name="pmdorand:pkmn.typing.retainment.description" xml:space="preserve">
+    <value>Controls whether a Pokemon's first or second type should be kept during randomization.</value>
+    <comment></comment>
   </data>
   <data name="PMDOR_CHANGELOG_2025-03-23" xml:space="preserve">
     <value>

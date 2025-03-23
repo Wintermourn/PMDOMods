@@ -17,4 +17,3 @@ menu:Open(true)
 ## Todo
 - [ ] Add function to insert options into top menu, options, ...
     - [ ] Generate option depending on how many additions are wanted (Create submenu if >1 insertions)
-- [ ] Paginated options menu (`menu:AddPage()`, `page:AddButton(...)`, ...)
