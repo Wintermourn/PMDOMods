@@ -13,3 +13,8 @@ local menu = options_menu(8,8,128,128)
 menu:AddButton("My Button", function() end)
 menu:Open(true)
 ```
+
+## Todo
+- [ ] Add function to insert options into top menu, options, ...
+    - [ ] Generate option depending on how many additions are wanted (Create submenu if >1 insertions)
+- [ ] Paginated options menu (`menu:AddPage()`, `page:AddButton(...)`, ...)

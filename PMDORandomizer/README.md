@@ -2,6 +2,8 @@
 > This mod is a heavy work in progress. Many features are unavailable, incomplete, or poorly made.
 # PMDO Randomizer
 Randomize Pokemon stats, moves, evolutions, abilities, as well as items and dungeons with a few button presses.
+
+**Depends On** [Menu Toolkit Library](../Menu_Toolkit_Library/). Make sure to enable it at the same time!
 ## Progress
 - [ ] Pokemon
   - [ ] Names
