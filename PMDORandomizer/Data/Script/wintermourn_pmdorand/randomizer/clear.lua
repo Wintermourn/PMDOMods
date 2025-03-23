@@ -23,10 +23,11 @@ local function ClearFolderPatches(folder, locals, labelWorking, labelSkip)
         t = t .. '\n' .. labelWorking
         notice.Info:SetAndFormatText(t);
         files = __Directory.GetFiles(folder);
-    
+
         for i = 0, files.Length - 1 do
             filename = files[i];
-    
+
+            -- if (string.EndsWith([".jsonpatch"]))
             if EndsWith:Invoke(filename, argumentsArray) then
                 os.remove(filename);
             end
@@ -44,10 +45,11 @@ local function ClearFolderPatchesWithoutMessage(folder)
 
     if __Directory.Exists(folder) then
         files = __Directory.GetFiles(folder);
-    
+
         for i = 0, files.Length - 1 do
             filename = files[i];
-    
+
+            -- if (string.EndsWith([".jsonpatch"]))
             if EndsWith:Invoke(filename, argumentsArray) then
                 os.remove(filename);
             end
