@@ -3,8 +3,8 @@ local CONST = require 'wintermourn_pmdorand.lib.constants'
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
 local data = {
-    version = "v0.0.0",
-    lastModified = "2025-03-09",
+    version = "v0.1.0",
+    lastModified = "DEV",
     ---@type file*?
     spoilerLog = nil,
     seeding = {

@@ -112,106 +112,13 @@
     <value>This will clear every modified file from the randomizer, returning everything to normal.[br]Your current save will likely not play correctly after this.[pause=0] Continue?</value>
     <comment>Label of the Status Effects menu option.</comment>  
   </data>
-  <data name="PMDOR_CHANGELOG_2025-03-07" xml:space="preserve">
+  <data name="PMDOR_CHANGELOG_2025-03-23" xml:space="preserve">
     <value>
-  * Project started, here be dragons!
-  * Additionally started mentoolkit to handle
-UI creation and controls.
+Project code is now available on GitHub!
 
-Currently no functionality besides the Top
-Menu option, but here's hoping!
-    </value>
-  </data>
-  <data name="PMDOR_CHANGELOG_2025-03-08" xml:space="preserve">
-    <value>
-+ Changelog menu added
-  
-+ Plausibility confirmations have been
-performed. Tests have gone as follows:
-  * Pokemon info can be changed.
-    * Type 1 &amp; Type 2
-    * Learnsets
-    * Base Stats
-    * Intrinsics?
-  * Move info can be changed.
-    * Type &amp; Category
-    * Base Power &amp; Accuracy
-    * Hitboxes / AoE
-  * Status effects can be changed.
-  * Item info can be changed.
-    * Names
-    * Icons &amp; Sprites
-    * Price &amp; Max Stack
-    * Dropability
-    * Entire use events
-  [color=#ffaa00]* Dungeon changes might work.
-Unsure of data locations or publicity.
-    </value>
-  </data>
-  <data name="PMDOR_CHANGELOG_2025-03-09" xml:space="preserve">
-    <value>
-This is infinitely more obtuse than expected
-thanks to the unreasonable action of
-trying to safe memory. How dare they?!
-
-On the bright side, I probably don't need
-cachers anymore. I just need to make
-overrides now. The downside? Lots of
-file generation.
-
-This info above is immediately outdated.
-Some things require caching, while others
-do not. This is also very useful.
-
-Fully Cached:
- - Elements
- - GrowthData
-Not Fully Caches:
- - Monsters (reasonable)
- - Moves (reasonable)
- ... to be tested
-
-+ CSHook.lua
-- CSHook.lua
-    </value>
-  </data>
-  <data name="PMDOR_CHECKLIST" xml:space="preserve">
-    <value>
-Seeding
- [color=#99ff99]- [X] Seed Input
- - [ ] Seed Saving
- [color=#99ff99]- [X] Seed Clearing
-Types
- - [ ] Names
- - [ ] Icons
- - [ ] Effectivity
-Pokemon
- - [ ] Type Randomization
- - [ ] Evolution Paths
- - [ ] Base Stats
- - [ ] Learnsets
- - [ ] Intrinsics?
-Status Effects
- - [ ] Generate new effects
- - [ ] Perish Song duration
- - [ ] Poison damage
-Moves
- - [ ] Types &amp; Category
- - [ ] Base Power &amp; Accuracy
- - [ ] Hitboxes / Range
-Items
- - [ ] Icons &amp; Sprites
- - [ ] Prices
- - [ ] Stack Size
- - [ ] Use Events
-Naming
- - [ ] Pokemon
- - [ ] Items
- - [ ] Moves
- - [ ] Dungeons
-Dungeons (unknown)
- - [ ] Tileset Shuffle
- - [ ] Generation type shuffle
+Type generation for Pokemon has been updated
+to work with blacklist as well as retaining
+secondary type and avoiding duplicates. Wahoo!
     </value>
   </data>
 </root>

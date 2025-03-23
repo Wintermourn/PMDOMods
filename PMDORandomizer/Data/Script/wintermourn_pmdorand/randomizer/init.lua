@@ -32,7 +32,7 @@ randomizer.OpenMenu = function ()
             right = randomizer.Data.version
         };
         menu:AddSpacer(6)
-        menu:AddText("[color=#a0a0a0]Currently Randomized?").labels.right = "[color=#ff3030]No[color]";
+        menu:AddText("[color=#a0a0a0]Currently Randomized?").labels.right = "[color=#ff3030]Not Tracked[color]";
         --[[ menu:AddButton("\n", CONST.FUNCTION_EMPTY).labels = {
             left = "Enabled\n - no functionality",
             center = "test",

@@ -5,10 +5,7 @@ local textile_menu = require 'mentoolkit.menus.textile'
 local changelog_menu;
 
 local CHANGELOG = {
-    { "2025-03-09", "PMDOR_CHANGELOG_2025-03-09" },
-    { "2025-03-08", "PMDOR_CHANGELOG_2025-03-08" },
-    { "2025-03-07", "PMDOR_CHANGELOG_2025-03-07" },
-    { "CHECKLIST", "PMDOR_CHECKLIST" }
+    { "2025-03-23", "PMDOR_CHANGELOG_2025-03-23" }
 }
 
 return function()
