@@ -49,8 +49,6 @@ local data = {
                 randomizationChance = 1,
                 --- Only allow pokemon to be dual-typed if they already have a second type.
                 retainDualTyping = false,
-                --- Keep the second type as the pokemon's original second type.
-                naturalSecondType = false,
                 --- Controls whether a Pokemon keeps its first type, second type, or neither.
                 ---@type false|1|2
                 typeRetainment = false,

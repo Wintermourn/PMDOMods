@@ -40,34 +40,6 @@ end):SetCallback('onRefresh', function (self)
     self:SetLabel('right', STRINGS:FormatKey("pmdorand:option.".. (value == 1 and 'first' or (value == 2 and 'second') or 'disabled')));
 end):SetDescription(data.language.descriptionText("pmdorand:pkmn.typing.retainment")):CalculateHeight();
 
---[[ local menu = options_menu(24,56,220,115);
-menu.title = "Typing";
-
---- ! TODO: Descriptive Menu
-
-menu:AddButton("Randomization", function (self)
-    data.options.pokemon.typing.enabled = not data.options.pokemon.typing.enabled;
-    self.labels.right = data.language.toggle(data.options.pokemon.typing.enabled);
-    self.menuElements.right:SetText(self.labels.right);
-end).labels.right = data.language.toggle(data.options.pokemon.typing.enabled);
-menu:AddSpacer(4)
-menu:AddHeader("Dual Typing")
-menu:AddButton("Allow Duplicates", function (self)
-    data.options.pokemon.typing.allowDuplicateTyping = not data.options.pokemon.typing.allowDuplicateTyping;
-    self.labels.right = data.language.toggle(data.options.pokemon.typing.allowDuplicateTyping);
-    self.menuElements.right:SetText(self.labels.right);
-end).labels.right = data.language.toggle(data.options.pokemon.typing.allowDuplicateTyping);
-menu:AddButton("Retain Dual Typing", function (self)
-    data.options.pokemon.typing.retainDualTyping = not data.options.pokemon.typing.retainDualTyping;
-    self.labels.right = data.language.toggle(data.options.pokemon.typing.retainDualTyping);
-    self.menuElements.right:SetText(self.labels.right);
-end).labels.right = data.language.toggle(data.options.pokemon.typing.retainDualTyping);
-menu:AddButton("Keep Second Type", function (self)
-    data.options.pokemon.typing.naturalSecondType = not data.options.pokemon.typing.naturalSecondType;
-    self.labels.right = data.language.toggle(data.options.pokemon.typing.naturalSecondType);
-    self.menuElements.right:SetText(self.labels.right);
-end).labels.right = data.language.toggle(data.options.pokemon.typing.naturalSecondType); ]]
-
 return function ()
     menu:Open(true);
 end;
