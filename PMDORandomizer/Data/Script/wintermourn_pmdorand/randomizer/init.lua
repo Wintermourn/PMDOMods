@@ -62,7 +62,6 @@ randomizer.OpenMenu = function ()
 
         menu:AddHeader("[color=#aaaaaa]Generation");
         menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_SEEDING"), perform 'wintermourn_pmdorand.randomizer.pages.seeding');
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_CACHING"), CONST.FUNCTION_EMPTY);
         menu:PageBreak();
 
         menu:AddHeader("[color=#aaaaaa]Randomization Options");
