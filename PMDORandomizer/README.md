@@ -38,6 +38,7 @@ Randomize Pokemon stats, moves, evolutions, abilities, as well as items and dung
   - [ ] Floor Items
   - [ ] Shop Items?
   - [ ] Traps & Hazards
+  - [ ] Background Music
 - [ ] Interface
   - [X] Changelog
   - [ ] Options
@@ -47,4 +48,9 @@ Randomize Pokemon stats, moves, evolutions, abilities, as well as items and dung
     - [ ] Items
     - [ ] Statuses
     - [ ] Dungeons
+    - [ ] Spoiler Logging
   - [ ] Advanced Mode
+    - [ ] Generate new entries
+    - [ ] Include unreleased entries
+    - [ ] Randomize item, ability, status effects
+      - [ ] Effect Weighting, ranges, ...
