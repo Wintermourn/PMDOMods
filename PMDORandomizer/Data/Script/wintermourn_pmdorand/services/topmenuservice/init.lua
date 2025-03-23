@@ -3,7 +3,7 @@ require 'origin.common'
 require 'origin.services.baseservice'
 local randomizer = require 'wintermourn_pmdorand.randomizer'
 
-local logger = require 'wintermourn_pmdorand.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
+local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 local data = require 'wintermourn_pmdorand.randomizer.data';
 
 local TMS = Class('TopMenuService', BaseService)

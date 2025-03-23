@@ -1,6 +1,6 @@
 local rand = require 'wintermourn_pmdorand.lib.pseudorandom'
 local CONST = require 'wintermourn_pmdorand.lib.constants'
-local logger = require 'wintermourn_pmdorand.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
+local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
 local data = {
     version = "v0.0.0",

@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global
-local logger = require 'wintermourn_pmdorand.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
+local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 local CONST = require 'wintermourn_pmdorand.lib.constants'
     local perform = CONST.PERFORM_LATER;
     local performwith = CONST.PERFORM_INSIDE_LATER;
