@@ -41,7 +41,6 @@ textile_page.__index = textile_page;
 function textile_menu:Rebuild()
     self.__menuElements:Clear();
 
-    local head = 0;
     local my = 8;
     local mw = self.__menu.Bounds.Width;
     local mh = self.__menu.Bounds.Height;

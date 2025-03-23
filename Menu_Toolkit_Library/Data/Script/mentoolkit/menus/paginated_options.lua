@@ -16,6 +16,7 @@ local paginated_options_menu = {
     ---Title of the window, placed at the top automatically
     ---@type string
     title   = nil,
+    ---The currently viewed page. Refresh for the user with page:Rebuild().
     currentPage = 1,
     ---The currently selected option.
     currentSelection = 1,
@@ -25,6 +26,7 @@ local paginated_options_menu = {
     pages = {},
     ---Additional `IMenuElement`s to be added and kept when rebuilding the menu.
     elements = {},
+    --- Description box data, handled by the menu automatically.
     __description = {
         menu = nil, title = '', description = ''
     }
@@ -35,33 +37,46 @@ paginated_options_menu.__index = paginated_options_menu;
 local options_page = {
     ---@type mentoolkit.PaginatedOptions
     __owner = nil,
+    ---@type mentoolkit.PaginatedOptions.Labelled[]
     contents = {},
     additionalElements = {}
 }
 options_page.__index = options_page;
 
 ---@class mentoolkit.PaginatedOptions.Labelled
+---A labelled page entry, capable of showing text and being pressed, if desired.
 local labelled = {
     ---@type mentoolkit.PaginatedOptions.Page
     __owner = nil,
     __menuElements = {},
+    --- Can this element be pressed?
     enabled = true,
+    --- Can this element be seen?
     visible = true,
+    --- Can this element be skipped by the cursor?
     selectable = true,
+    --- X and Y position for the cursor to be placed when hovered.
     cursorAnchor = RogueElements.Loc(0,0),
     --- How many pixels away from the window's left that the object should be able to reach.
     left = 16,
     ---Do not modify directly.<br>Use `labelled:SetLabel(direction, text)` instead.
     labels = {},
     actions = {
+        --- fires when the element is selected/pressed.
         ---@type fun(self: mentoolkit.PaginatedOptions.Labelled)
         onSelected = nil,
+        --- fires when the page the element is on is built (shown to the user).
+        ---@type fun(self: mentoolkit.PaginatedOptions.Labelled)
+        onRefresh = nil,
+        --- fires when the elements is selected and the user moves left or right.
+        --- * not yet implemented
         ---@type fun(self: mentoolkit.PaginatedOptions.Labelled, direction: -1|1, shiftHeld: boolean)
         onSlide = nil
     }
 }
 labelled.__index = labelled;
 
+--- Rebuilds the current menu, readjusting positions and showing items from the current page.
 function paginated_options_menu:Rebuild ()
     self.__menuElements:Clear();
 
@@ -106,7 +121,6 @@ function paginated_options_menu:Rebuild ()
         end
     end
 
-    self.cursor.Loc = RogueElements.Loc(8,26);
     self.__menuElements:Add(self.cursor);
 
     for i,k in pairs(self.elements) do
@@ -114,6 +128,8 @@ function paginated_options_menu:Rebuild ()
     end
 end
 
+--- Opens the menu, showing it to the user.
+---@param rebuild boolean Whether the menu should "rebuild", repositioning all visible elements.
 function paginated_options_menu:Open (rebuild)
     self.currentSelection = 1;
     if self.__description.menu and self.pages[self.currentPage] then
@@ -131,6 +147,12 @@ function paginated_options_menu:Open (rebuild)
     _MENU:AddMenu(self.__menu, true);
 end
 
+--- Creates a description panel for menu options to explain themselves.
+---@param x integer Menu X Position
+---@param y integer Menu Y Position
+---@param w integer Menu Width
+---@param h integer Menu Height
+---@return nil
 function paginated_options_menu:AddDescriptionPanel(x,y,w,h)
     if self.__description.menu then return self.__description.menu; end
     self.__description.menu = RogueEssence.Menu.ScriptableMenu(x,y,w,h, function(i)
@@ -149,12 +171,17 @@ function paginated_options_menu:AddDescriptionPanel(x,y,w,h)
     entries:Add(self.__description.descriptionObject);
 end
 
+--- Sets the text contained in the description box if it exists.<br>
+--- ⚠️ Make sure to create the description box first via `menu:AddDescriptionPanel`!
+---@param title any
+---@param description any
 function paginated_options_menu:SetDescription(title, description)
     if not self.__description.menu then return end
     self.__description.titleObject:SetText(title);
     self.__description.descriptionObject:SetAndFormatText(description);
 end
 
+--- Adds a new page to the end of the current menu.
 ---@return mentoolkit.PaginatedOptions.Page
 function paginated_options_menu:AddPage ()
     local page = {
@@ -167,8 +194,9 @@ function paginated_options_menu:AddPage ()
     return page;
 end
 
----@param label string
----@return mentoolkit.PaginatedOptions.Labelled
+--- Adds "header" text to the page which is skipped by the cursor automatically.
+---@param label string The left aligned label for the header
+---@return mentoolkit.PaginatedOptions.Labelled header
 function options_page:AddHeader(label)
     local option = {
         __owner = self,
@@ -187,9 +215,10 @@ function options_page:AddHeader(label)
     return option;
 end
 
----@param label string
----@param onSelected fun(self: mentoolkit.PaginatedOptions.Labelled)
----@return mentoolkit.PaginatedOptions.Labelled
+--- Adds a button to the current menu page.
+---@param label string The left aligned label for the button
+---@param onSelected fun(self: mentoolkit.PaginatedOptions.Labelled) Fires when the button is selected/pressed
+---@return mentoolkit.PaginatedOptions.Labelled button
 function options_page:AddButton(label, onSelected)
     local option = {
         __owner = self,
@@ -275,9 +304,8 @@ function labelled:CalculateHeight()
     return self;
 end
 
----comment
 ---@param menu mentoolkit.PaginatedOptions
----@param input any
+---@param input any (C# InputManager object)
 ---@return function|nil
 local controls_listener = function (menu, input)
     if input:JustPressed(RogueEssence.FrameInput.InputType.Cancel) or input:JustPressed(RogueEssence.FrameInput.InputType.Menu) then
@@ -363,6 +391,11 @@ local controls_listener = function (menu, input)
     end
 end
 
+---Paginated Options menu constructor
+---@param x integer X Position
+---@param y integer Y Position
+---@param w integer Menu Width
+---@param h integer Menu Height
 ---@return mentoolkit.PaginatedOptions
 return function(x, y, w, h)
     local o = {
