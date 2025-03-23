@@ -4,7 +4,7 @@
   <Description>Tools for easily creating Scriptable Menus in various forms.</Description>
   <Namespace>mentoolkit</Namespace>
   <UUID>6543E632-3617-4BC2-86E0-2DF1C8CF1BD9</UUID>
-  <Version>0.0</Version>
+  <Version>0.1</Version>
   <GameVersion>0.8.8</GameVersion>
   <ModType>Mod</ModType>
   <Relationships />
