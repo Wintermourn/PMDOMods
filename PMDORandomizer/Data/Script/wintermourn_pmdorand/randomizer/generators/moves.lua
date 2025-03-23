@@ -1,7 +1,4 @@
 local CONST = require 'wintermourn_pmdorand.lib.constants';
-    local System = CONST.Classes.System;
-    local BindingFlags = CONST.Enums.BindingFlags;
-    local Enumerable_ToArray = CONST.Methods.System.Linq.Enumerable.ToArray;
 
 local data = require 'wintermourn_pmdorand.randomizer.data'
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');

@@ -1,5 +1,4 @@
 local data = require 'wintermourn_pmdorand.randomizer.data'
-local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
 local ucache = require 'wintermourn_pmdorand.randomizer.utilitycache'
 

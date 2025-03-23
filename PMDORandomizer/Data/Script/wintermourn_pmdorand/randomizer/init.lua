@@ -2,7 +2,6 @@
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 local CONST = require 'wintermourn_pmdorand.lib.constants'
     local perform = CONST.PERFORM_LATER;
-    local performwith = CONST.PERFORM_INSIDE_LATER;
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
 
@@ -13,8 +12,6 @@ local randomizer = {
         Top_Menu = nil
     }
 }
-local menus = {}
-local topMenu = {}
 
 
 randomizer.OpenMenu = function ()

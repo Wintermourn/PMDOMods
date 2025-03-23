@@ -1,10 +1,7 @@
 local CONST = require 'wintermourn_pmdorand.lib.constants'
-local Data = require 'wintermourn_pmdorand.randomizer.data'
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
 local items_menu;
-
-local buttons = {};
 
 return function()
     if items_menu == nil then
@@ -12,9 +9,9 @@ return function()
         items_menu.title = "Items"
 
         items_menu:AddButton("Randomization", CONST.FUNCTION_EMPTY).labels.right = STRINGS:FormatKey("pmdorand:option.disabled");
-        buttons.sprites = items_menu:AddSubmenuButton("Sprites", CONST.FUNCTION_EMPTY);
-        buttons.prices = items_menu:AddSubmenuButton("Prices & Stacks", CONST.FUNCTION_EMPTY);
-        buttons.uses = items_menu:AddSubmenuButton("Item Uses", CONST.FUNCTION_EMPTY);
+        items_menu:AddSubmenuButton("Sprites", CONST.FUNCTION_EMPTY);
+        items_menu:AddSubmenuButton("Prices & Stacks", CONST.FUNCTION_EMPTY);
+        items_menu:AddSubmenuButton("Item Uses", CONST.FUNCTION_EMPTY);
     end
     items_menu:Open(true);
 end
