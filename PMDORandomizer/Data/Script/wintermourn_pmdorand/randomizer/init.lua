@@ -52,7 +52,7 @@ randomizer.OpenMenu = function ()
 
         menu:AddButton("Clear Randomization", function ()
             local confirmation = _MENU:CreateQuestion(
-                STRINGS:FormatKey("RANDOMIZER_CLEAR_FILES"),
+                STRINGS:FormatKey("pmdorand:top.clear"),
                 perform 'wintermourn_pmdorand.randomizer.clear',
                 CONST.FUNCTION_EMPTY
             );
@@ -61,16 +61,16 @@ randomizer.OpenMenu = function ()
         menu:PageBreak();
 
         menu:AddHeader("[color=#aaaaaa]Generation");
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_SEEDING"), perform 'wintermourn_pmdorand.randomizer.pages.seeding');
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.seeding"), perform 'wintermourn_pmdorand.randomizer.pages.seeding');
         menu:PageBreak();
 
         menu:AddHeader("[color=#aaaaaa]Randomization Options");
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_POKEMON"), perform 'wintermourn_pmdorand.randomizer.pages.pokemon');
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_MOVES"), perform 'wintermourn_pmdorand.randomizer.pages.moves');
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_ITEMS"), perform 'wintermourn_pmdorand.randomizer.pages.items');
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_DUNGEONS"), CONST.FUNCTION_EMPTY);
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_NAMING"), perform 'wintermourn_pmdorand.randomizer.pages.naming');
-        menu:AddSubmenuButton(STRINGS:FormatKey("RANDOMIZER_MENU_STATUSES"), perform 'wintermourn_pmdorand.randomizer.pages.statuses');
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.pokemon"), perform 'wintermourn_pmdorand.randomizer.pages.pokemon');
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.moves"), perform 'wintermourn_pmdorand.randomizer.pages.moves');
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.items"), perform 'wintermourn_pmdorand.randomizer.pages.items');
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.dungeons"), CONST.FUNCTION_EMPTY);
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.naming"), perform 'wintermourn_pmdorand.randomizer.pages.naming');
+        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.statuses"), perform 'wintermourn_pmdorand.randomizer.pages.statuses');
 
         logger:debug("Mods path", randomizer.Data.mod.path);
     else

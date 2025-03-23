@@ -58,47 +58,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MENU_RANDOMIZER_TOP" xml:space="preserve">
+  <data name="pmdorand:topmenu" xml:space="preserve">
     <value>Randomizer</value>
     <comment>Label of the randomizer option on the title (top) menu.</comment>  
   </data>
-  <data name="MENU_RANDOMIZER_TITLE" xml:space="preserve">
+  <data name="pmdorand:title" xml:space="preserve">
     <value>PMDO Randomizer</value>
     <comment>Title of the Randomizer window when opened.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_SEEDING" xml:space="preserve">
+  <data name="pmdorand:top.seeding" xml:space="preserve">
     <value>RNG Seeding</value>
     <comment>Label of the seeding menu option, used to control how things randomize.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_CACHING" xml:space="preserve">
-    <value>[color=#ddaa77]Caching</value>
-    <comment>Label of the caching menu option, used to control randomizer optimization.</comment>  
-  </data>
-  <data name="RANDOMIZER_MENU_POKEMON" xml:space="preserve">
+  <data name="pmdorand:top.pokemon" xml:space="preserve">
     <value>Pokemon</value>
     <comment>Label of the Pokemon menu option, containing stat, ability, and evolution randomization.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_ITEMS" xml:space="preserve">
+  <data name="pmdorand:top.items" xml:space="preserve">
     <value>Items</value>
     <comment>Label of the Items menu option, containing item stat and appearance randomization.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_MOVES" xml:space="preserve">
+  <data name="pmdorand:top.moves" xml:space="preserve">
     <value>Moves</value>
     <comment>Label of the Moves menu options, controlling Power, AoE, and typing.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_DUNGEONS" xml:space="preserve">
+  <data name="pmdorand:top.dungeons" xml:space="preserve">
     <value>[color=#777777]Dungeons</value>
     <comment>Label of the Dungeons menu option, controlling dungeon appearance and traits.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_NAMING" xml:space="preserve">
+  <data name="pmdorand:top.naming" xml:space="preserve">
     <value>Naming</value>
     <comment>Label of the Naming menu option, controlling dungeon, item, and Pokemon names.</comment>  
   </data>
-  <data name="RANDOMIZER_MENU_STATUSES" xml:space="preserve">
+  <data name="pmdorand:top.statuses" xml:space="preserve">
     <value>Statuses</value>
     <comment>Label of the Status Effects menu option.</comment>  
   </data>
-  <data name="RANDOMIZER_SEED_CLEAR" xml:space="preserve">
+  <data name="pmdorand:seed.clear" xml:space="preserve">
     <value>[color=#777777]Press `DELETE` to clear the selected seed.</value>
     <comment></comment>  
   </data>
@@ -114,9 +110,8 @@
   <data name="pmdorand:option.disabled" xml:space="preserve">
     <value>[color=#ff9090]Disabled</value>
   </data>
-  <data name="RANDOMIZER_CLEAR_FILES" xml:space="preserve">
+  <data name="pmdorand:top.clear" xml:space="preserve">
     <value>This will clear every modified file from the randomizer, returning everything to normal.[br]Your current save will likely not play correctly after this.[pause=0] Continue?</value>
-    <comment>Label of the Status Effects menu option.</comment>  
   </data>
   <data name="pmdorand:pkmn.typing.rand.title" xml:space="preserve">
     <value>Type Randomization</value>

@@ -84,7 +84,7 @@ return function()
         seeding_menu.title = "Seeding"
         seeding_menu.onInput = menu_input;
 
-        seeding_menu:AddHeader(STRINGS:FormatKey("RANDOMIZER_SEED_CLEAR"))
+        seeding_menu:AddHeader(STRINGS:FormatKey("pmdorand:seed.clear"))
         createSharedButton();
 
         seeding_menu:AddSpacer(4);

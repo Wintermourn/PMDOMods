@@ -36,7 +36,7 @@ TMS_Shared.Callbacks.onTopMenuAdded = function (topMenu)
         1,
         RogueEssence.Menu.MenuTextChoice(
             'MENU_RANDOMIZER',
-            STRINGS:FormatKey("MENU_RANDOMIZER_TOP"),
+            STRINGS:FormatKey("pmdorand:topmenu"),
             randomizer.OpenMenu
         )
     );
