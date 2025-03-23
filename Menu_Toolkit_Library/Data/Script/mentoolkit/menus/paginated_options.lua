@@ -82,7 +82,7 @@ function paginated_options_menu:Rebuild ()
 
     local mw = self.__menu.Bounds.Width;
     local mh = self.__menu.Bounds.Height;
-    local y = 0;
+    local y = 8;
     if self.title then
         if not self.__cache.hasTitle then
             self.__cache.hasTitle = true;
@@ -92,7 +92,7 @@ function paginated_options_menu:Rebuild ()
         self.__menuElements:Add(self.__cache.globalElements.title);
         self.__menuElements:Add(self.__cache.globalElements.divider);
 
-        y = y + 26;
+        y = y + 18;
     end
 
     if self.pages[self.currentPage] then
