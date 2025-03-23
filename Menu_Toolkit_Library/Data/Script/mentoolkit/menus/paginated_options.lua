@@ -108,6 +108,10 @@ function paginated_options_menu:Rebuild ()
 
     self.cursor.Loc = RogueElements.Loc(8,26);
     self.__menuElements:Add(self.cursor);
+
+    for i,k in pairs(self.elements) do
+        self.__menuElements:Add(k);
+    end
 end
 
 function paginated_options_menu:Open (rebuild)
