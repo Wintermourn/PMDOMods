@@ -5,7 +5,6 @@ local CONST = require 'wintermourn_pmdorand.lib.constants';
 
 local data = require 'wintermourn_pmdorand.randomizer.data'
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
-local json = require 'wintermourn_pmdorand.lib.json'
 
 local __Type = CONST.Classes.System.Type;
 local type_BasePowerState = __Type.GetType('RogueEssence.Dungeon.BasePowerState, RogueEssence');
@@ -58,7 +57,7 @@ moves_randomizer.Randomize = function ()
         --- Base Power
         if basePowerOptions.enabled and data.randomizationChance(basePowerOptions.randomizationChance, 'moves.values') then
             basePowerState = currentEntry.Data.SkillStates:GetWithDefault(type_BasePowerState);
-            if basePowerState == nil then goto skip_power end
+            if basePowerState == nil or basePowerState.Power == 0 then goto skip_power end
             localSpoiler.Power = {from = basePowerState.Power};
             if basePowerOptions.weightedPower.enabled then
                 local maxOffset = basePowerState.Power * basePowerOptions.powerRandomizationRange;

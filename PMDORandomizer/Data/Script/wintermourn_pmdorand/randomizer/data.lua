@@ -78,6 +78,7 @@ local data = {
                 randomizationChance = 1,
                 bannedTypes = {'none'}
             },
+            -- * not implemented
             powerPoints = {
                 enabled = true,
                 randomizationChance = 1,
@@ -88,11 +89,15 @@ local data = {
             basePower = {
                 enabled = true,
                 randomizationChance = 1,
+                --- The maximum change in a move's base power. For example, `0.4` means that a move can lose up to 40% power or gain up to 40% power.
                 powerRandomizationRange = 0.4,
                 minimumPower = 1,
+                --- The absolute limit of power a move can have.
                 maximumPower = 120,
                 weightedPower = {
                     enabled = true,
+                    --- Controls how strongly weighted power pulls towards the center.
+                    -- Values between 0 and 1 pull towards the original move's power, while values over 1 will pull away from it.
                     originalPowerWeight = 0.5
                 }
             },
