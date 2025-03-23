@@ -29,6 +29,8 @@ textile_menu.__index = textile_menu;
 
 ---@class mentoolkit.Textile.Page
 local textile_page = {
+    ---@type mentoolkit.Textile
+    __owner = nil,
     ---@type string[]
     flowed_contents = {},
     ---Additional `IMenuElement`s to be added and kept when rebuilding the menu on this page.
@@ -106,6 +108,7 @@ end
 ---@return mentoolkit.Textile.Page
 function textile_menu:CreatePage()
     local o = {
+        __owner = self,
         flowed_contents = {}, elements = {}
     };
     setmetatable(o, textile_page);
@@ -133,18 +136,18 @@ function textile_page:TextAt(x,y, text, dirx, diry)
 end
 
 function textile_page:Insert(index, text)
-    local lines = split(text, '\n');
+    local lines = RogueEssence.Menu.MenuText.BreakIntoLines(text, self.__owner.__menu.Bounds.Width - 16);
 
-    for i, k in pairs(lines) do
-        self.flowed_contents[index + i] = k;
+    for i = 0, lines.Length - 1 do
+        table.insert(self.flowed_contents, index + i, lines[i]);
     end
 end
 
 function textile_page:Append(text)
-    local lines = split(text, '\n');
+    local lines = RogueEssence.Menu.MenuText.BreakIntoLines(text, self.__owner.__menu.Bounds.Width - 16);
 
-    for _, k in pairs(lines) do
-        self.flowed_contents[#self.flowed_contents+1] = k;
+    for i = 0, lines.Length - 1 do
+        self.flowed_contents[#self.flowed_contents+1] = lines[i];
     end
 end
 
