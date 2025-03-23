@@ -154,7 +154,8 @@
     <value>
 Project code is now available on GitHub!
 
-Type generation for Pokemon has been updated to work with blacklist as well as retaining secondary type and avoiding duplicates. Wahoo!
+Type randomization for Pokemon has been updated to work with blacklist as well as retaining secondary type and avoiding duplicates. Wahoo!
+Some type randomization options are also available in the in-game menu.
     </value>
   </data>
 </root>
