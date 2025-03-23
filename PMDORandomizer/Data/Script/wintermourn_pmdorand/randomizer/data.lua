@@ -5,8 +5,6 @@ local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAN
 local data = {
     version = "v0.1.0",
     lastModified = "DEV",
-    ---@type file*?
-    spoilerLog = nil,
     seeding = {
         shared_seed         = '',
         seeds = {
@@ -31,14 +29,6 @@ local data = {
             abilities = ''
         }
     },
-    updateCoroutine = nil,
-    updateRoutineUtils = {
-        ---@type table
-        menuOption = nil,
-        ---@type mentoolkit.Options
-        menu = nil
-    },
-    mod = {},
     options = {
         generateSpoilerLog = true,
         pokemon = {
@@ -63,9 +53,11 @@ local data = {
             moves = {
                 enabled = true,
                 randomizationChance = 1,
+                --- How many moves should a Pokemon start with (at level 1)?
                 guaranteedStartingMoves = 4,
-                enforceStartingAttackingMove = true,
+                --- How many of the starting moves should be attacks (physical/special)?
                 ensuredAttackingMoves = 2,
+                -- * not implemented
                 learnset = {
                     shuffleExisting = false,
                 }
@@ -74,7 +66,7 @@ local data = {
                 enabled = true,
                 randomizationChance = 1,
                 --- Chance for an already blank ability slot to be filled (pokemon with less than three abilities can get up to three)
-                --- todo: not implemented yet
+                -- * not implemented
                 slotFillChance = 0
             }
         },
@@ -104,17 +96,29 @@ local data = {
                     originalPowerWeight = 0.5
                 }
             },
+            -- * not implemented
             category = {
                 enabled = true,
                 randomizationChance = 1
             }
         },
+        -- * not implemented
         abilities = {
             enabled = true,
             randomizationChance = 1,
             additionalRules = {} -- *
         }
-    }
+    },
+    ---@type file*?
+    spoilerLog = nil,
+    updateCoroutine = nil,
+    updateRoutineUtils = {
+        ---@type table
+        menuOption = nil,
+        ---@type mentoolkit.Options
+        menu = nil
+    },
+    mod = {}
 };
 data.mod.header = RogueEssence.PathMod.GetModFromNamespace("wintermourn_pmdorand");
 data.mod.path = CONST.Classes.System.IO.Path.Combine(RogueEssence.PathMod.APP_PATH, data.mod.header.Path);
