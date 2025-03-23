@@ -1,0 +1,13 @@
+{
+    "Lua.diagnostics.globals": [
+        "LUA_ENGINE",
+        "luanet",
+        "RogueEssence",
+        "RogueElements",
+        "_MENU",
+        "Color",
+        "STRINGS",
+        "_GAME",
+        "_DATA"
+    ]
+}

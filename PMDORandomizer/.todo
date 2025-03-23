@@ -1,0 +1,41 @@
+Randomizables:
+    Pokemon:
+        - [ ] Form Name
+        - [ ] Base Stat Randomization
+        - [ ] Available TMs
+        - [ ] Available HMs
+        - [ ] Max Stat Boost
+        - [X] Learnset @done
+        - [X] Type @done
+    Moves:
+        - [ ] Move Name
+        - [ ] Category
+        - [X] Type @done
+        - [X] Base Power @done
+        - [ ] Accuracy
+        - [ ] Hitbox
+    Items:
+        - [ ] Item Name
+        - [ ] Sprite & Icon
+        - [ ] Price
+        - [ ] Max Stack
+        - [ ] Dropability
+        - [ ] UseEvent
+    Statuses:
+        - [ ] Durations
+        - [ ] Damage Amounts
+    Elements:
+        - [ ] Names
+        - [ ] Icons
+        - [ ] Effectivity
+    Intrinsics / Abilities:
+        It would be fun to have a sort of shuffling system (like effects that trigger while confused could be replaced with a different status),
+        but it would probably be a lot of work to make sure the descriptions line up with what's actually happening. I suppose in the meanwhile,
+        they could just be replaced with gibberish to show that they don't trigger like they usually would.
+        - [ ] Names
+        - [ ] Description
+        - [ ] Actions
+    
+Files:
+    - [ ] Data/Universal.json
+        Contains type effectivity table (GROSS! I *guess* diff modding makes this better to edit, but _come on!_)

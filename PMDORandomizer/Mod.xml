@@ -1,0 +1,17 @@
+<Header>
+  <Name>PMDORandomizer</Name>
+  <Author>Wintermourn</Author>
+  <Description>Provides extensive randomization options.</Description>
+  <Namespace>wintermourn_pmdorand</Namespace>
+  <UUID>B16CED41-5CAC-451B-BAA4-D1386A0A4415</UUID>
+  <Version>0.0</Version>
+  <GameVersion>0.8.8</GameVersion>
+  <ModType>Mod</ModType>
+  <Relationships>
+    <RelatedMod>
+      <UUID>6543E632-3617-4BC2-86E0-2DF1C8CF1BD9</UUID>
+      <Namespace>mentoolkit</Namespace>
+      <Relationship>DependsOn</Relationship>
+    </RelatedMod>
+  </Relationships>
+</Header>
