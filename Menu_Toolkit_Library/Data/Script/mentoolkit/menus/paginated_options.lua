@@ -132,14 +132,19 @@ end
 ---@param rebuild boolean Whether the menu should "rebuild", repositioning all visible elements.
 function paginated_options_menu:Open (rebuild)
     self.currentSelection = 1;
-    if self.__description.menu and self.pages[self.currentPage] then
-        self.pages[self.currentPage]:Refresh();
+    if rebuild then self:Rebuild() end
+    if self.pages[self.currentPage] then
         local entry = self.pages[self.currentPage].contents[self.currentSelection];
-        if entry and entry.description then
-            self:SetDescription(entry.description.title, entry.description.content);
+        if entry then
+            if self.__description.menu then
+                self.pages[self.currentPage]:Refresh();
+                if entry and entry.description then
+                    self:SetDescription(entry.description.title, entry.description.content);
+                end
+            end
+            self.cursor.Loc = entry.cursorAnchor;
         end
     end
-    if rebuild then self:Rebuild() end
 
     if self.__description.menu then
         _MENU:AddMenu(self.__description.menu, true);
