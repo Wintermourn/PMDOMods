@@ -32,6 +32,7 @@ local CONST = {
     Methods = {
         ---@type fun(x: integer, y: integer): Loc
         Location = RogueElements.Loc,
+        String = {},
         Menu = {
             MenuText = RogueEssence.Menu.MenuText,
             Elements = {

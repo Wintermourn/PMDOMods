@@ -61,6 +61,8 @@ local labelled = {
     left = 16,
     ---Do not modify directly.<br>Use `labelled:SetLabel(direction, text)` instead.
     labels = {},
+    ---Only applies to labels with dividers.
+    dividerHeight = 0,
     actions = {
         --- fires when the element is selected/pressed.
         ---@type fun(self: mentoolkit.PaginatedOptions.Labelled)
@@ -113,7 +115,7 @@ function paginated_options_menu:Rebuild ()
             end
             y = y + (k.textHeight or 0);
             if k.__menuElements.divider then
-                k.__menuElements.label_left.Loc = RogueElements.Loc(k.__menuElements.divider.Loc.X, y);
+                k.__menuElements.divider.Loc = RogueElements.Loc(k.__menuElements.divider.Loc.X, y);
                 self.__menuElements:Add(k.__menuElements.divider);
                 y = y + k.dividerHeight;
             end
@@ -128,16 +130,29 @@ function paginated_options_menu:Rebuild ()
     end
 end
 
+function paginated_options_menu:CursorTo(pageNum, elementNum)
+    self.currentPage = pageNum; self.currentSelection = elementNum;
+    self.cursor.Loc = self.pages[self.currentPage].contents[self.currentSelection].cursorAnchor;
+    self:Rebuild();
+end
+
 --- Opens the menu, showing it to the user.
 ---@param rebuild boolean Whether the menu should "rebuild", repositioning all visible elements.
 function paginated_options_menu:Open (rebuild)
     self.currentSelection = 1;
+    self.pages[self.currentPage]:Refresh();
     if rebuild then self:Rebuild() end
     if self.pages[self.currentPage] then
-        local entry = self.pages[self.currentPage].contents[self.currentSelection];
+        local page = self.pages[self.currentPage];
+        local entry = page.contents[self.currentSelection];
         if entry then
+            if not entry.selectable or not entry.visible then
+                repeat
+                    self.currentSelection = self.currentSelection + 1;
+                    entry = page.contents[self.currentSelection];
+                until entry.selectable or self.currentSelection == #page.contents;
+            end
             if self.__description.menu then
-                self.pages[self.currentPage]:Refresh();
                 if entry and entry.description then
                     self:SetDescription(entry.description.title, entry.description.content);
                 end
@@ -220,6 +235,44 @@ function options_page:AddHeader(label)
     return option;
 end
 
+---@param label string The left aligned label for the element
+---@return mentoolkit.PaginatedOptions.Labelled header
+function options_page:AddText(label)
+    local option = {
+        __owner = self,
+        labels = {},
+        enabled = false,
+        selectable = false,
+        actions = {},
+        left = 16,
+        __menuElements = {}
+    };
+    option.lines = select(2, string.gsub(label, '\n', '\n')) + 1;
+    setmetatable(option, labelled);
+    option:SetLabel('left', label);
+    option:CalculateHeight();
+    self.contents[#self.contents+1] = option;
+    return option;
+end
+
+function options_page:AddSpacer(distance)
+    local option = {
+        __owner = self,
+        labels = {},
+        enabled = false,
+        selectable = false,
+        actions = {},
+        left = 17,
+        dividerHeight = distance,
+        __menuElements = {}
+    };
+    option.lines = 0;
+    setmetatable(option, labelled);
+    option.__menuElements.divider = RogueEssence.Menu.MenuDivider(RogueElements.Loc(17,0), self.__owner.__menu.Bounds.Width - 27);
+    self.contents[#self.contents+1] = option;
+    return option;
+end
+
 --- Adds a button to the current menu page.
 ---@param label string The left aligned label for the button
 ---@param onSelected fun(self: mentoolkit.PaginatedOptions.Labelled) Fires when the button is selected/pressed
@@ -243,6 +296,30 @@ function options_page:AddButton(label, onSelected)
     return option;
 end
 
+--- Adds a button with pre-added arrow indicator.
+---@param label string The left aligned label for the button
+---@param onSelected fun(self: mentoolkit.PaginatedOptions.Labelled) Fires when the button is selected/pressed
+---@return mentoolkit.PaginatedOptions.Labelled button
+function options_page:AddSubmenuButton(label, onSelected)
+    local option = {
+        __owner = self,
+        labels = {},
+        enabled = true,
+        actions = {
+            onSelected = onSelected
+        },
+        left = 16,
+        __menuElements = {}
+    };
+    option.lines = select(2, string.gsub(label, '\n', '\n')) + 1;
+    setmetatable(option, labelled);
+    option:SetLabel('left', label);
+    option:SetLabel('right', '>');
+    option:CalculateHeight();
+    self.contents[#self.contents+1] = option;
+    return option;
+end
+
 function options_page:Refresh()
     for _,k in pairs(self.contents) do
         if k.actions and k.actions.onRefresh then
@@ -255,6 +332,7 @@ end
 ---@param text string
 ---@return mentoolkit.PaginatedOptions.Labelled
 function labelled:SetLabel(label, text)
+    text = text:gsub("%[br%]",'\n');
     if label == 'left' then
         if self.__menuElements.label_left then
             self.__menuElements.label_left:SetText(text);
@@ -309,89 +387,119 @@ function labelled:CalculateHeight()
     return self;
 end
 
+local inputs = {
+    ['close'] = function (menu, playSound)
+        if playSound then _GAME:SE("Menu/Cancel"); end
+        if menu.__description.menu then
+            _MENU:RemoveMenu();
+        end
+        _MENU:RemoveMenu();
+    end,
+    ['confirm'] = function (menu, playSound)
+        local options = menu.pages[menu.currentPage].contents;
+        if options[menu.currentSelection] and options[menu.currentSelection].enabled then
+            if playSound then _GAME:SE("Menu/Confirm"); end
+            options[menu.currentSelection].actions.onSelected(options[menu.currentSelection]);
+        end
+    end,
+    ['up'] = function (menu, playSound)
+        local options = menu.pages[menu.currentPage].contents;
+        menu.currentSelection = menu.currentSelection - 1;
+        if menu.currentSelection == 0 then menu.currentSelection = #options end
+        while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
+            menu.currentSelection = menu.currentSelection - 1;
+            if menu.currentSelection == 0 then menu.currentSelection = #options end
+        end
+        if playSound then _GAME:SE("Menu/Select"); end
+
+        if options[menu.currentSelection].description then
+            menu:SetDescription(options[menu.currentSelection].description.title, options[menu.currentSelection].description.content);
+        end
+        menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
+        menu.cursor:ResetTimeOffset();
+    end,
+    ['down'] = function (menu, playSound)
+        local options = menu.pages[menu.currentPage].contents;
+        menu.currentSelection = menu.currentSelection % #options + 1;
+        if menu.currentSelection == 0 then menu.currentSelection = #options end
+        while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
+            menu.currentSelection = menu.currentSelection % #options + 1;
+        end
+        if playSound then _GAME:SE("Menu/Select"); end
+
+        if options[menu.currentSelection].description then
+            menu:SetDescription(options[menu.currentSelection].description.title, options[menu.currentSelection].description.content);
+        end
+        menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
+        menu.cursor:ResetTimeOffset();
+    end,
+    ['left'] = function (menu, playSound)
+        local options = menu.pages[menu.currentPage].contents;
+        menu.currentPage = menu.currentPage - 1;
+        if menu.currentPage <= 0 then menu.currentPage = #menu.pages end
+        options = menu.pages[menu.currentPage].contents;
+        menu.currentSelection = 1;
+        while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
+            menu.currentSelection = menu.currentSelection % #options + 1;
+        end
+        if playSound then _GAME:SE("Menu/Select"); end
+
+        menu.pages[menu.currentPage]:Refresh();
+        menu:Rebuild();
+
+        menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
+        menu.cursor:ResetTimeOffset();
+    end,
+    ['right'] = function (menu, playSound)
+        local options = menu.pages[menu.currentPage].contents;
+        menu.currentPage = menu.currentPage % #menu.pages + 1;
+        options = menu.pages[menu.currentPage].contents;
+        menu.currentSelection = 1;
+        while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
+            menu.currentSelection = menu.currentSelection % #options + 1;
+        end
+        if playSound then _GAME:SE("Menu/Select"); end
+
+        menu.pages[menu.currentPage]:Refresh();
+        menu:Rebuild();
+
+        menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
+        menu.cursor:ResetTimeOffset();
+    end
+}
+
+---@param input 'close'|'confirm'|'up'|'down'|'left'|'right'
+---@param playSound boolean?
+function paginated_options_menu:Input(input, playSound)
+    if inputs[input] then inputs[input](self, playSound) end
+end
+
 ---@param menu mentoolkit.PaginatedOptions
 ---@param input any (C# InputManager object)
 ---@return function|nil
 local controls_listener = function (menu, input)
     if input:JustPressed(RogueEssence.FrameInput.InputType.Cancel) or input:JustPressed(RogueEssence.FrameInput.InputType.Menu) then
-        _GAME:SE("Menu/Cancel");
-        if menu.__description.menu then
-            _MENU:RemoveMenu();
-        end
-        _MENU:RemoveMenu();
+        paginated_options_menu.Input(menu, 'close', true);
         return;
     end
 
     if menu.onInput then if menu:onInput(input) then return end end
 
     if menu.pages[menu.currentPage] then
-        local options = menu.pages[menu.currentPage].contents;
-    
         if input:JustPressed(RogueEssence.FrameInput.InputType.Confirm) then
-            if options[menu.currentSelection] and options[menu.currentSelection].enabled then
-                _GAME:SE("Menu/Confirm");
-                options[menu.currentSelection].actions.onSelected(options[menu.currentSelection]);
-            end
+            paginated_options_menu.Input(menu, 'confirm', true);
             return;
         end
 
         if input.Direction == input.PrevDirection then return end
         if input.Direction == Dir8.UP then
-            menu.currentSelection = menu.currentSelection - 1;
-            if menu.currentSelection == 0 then menu.currentSelection = #options end
-            while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
-                menu.currentSelection = menu.currentSelection - 1;
-                if menu.currentSelection == 0 then menu.currentSelection = #options end
-            end
-            _GAME:SE("Menu/Select");
-
-            if options[menu.currentSelection].description then
-                menu:SetDescription(options[menu.currentSelection].description.title, options[menu.currentSelection].description.content);
-            end
-            menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
-            menu.cursor:ResetTimeOffset();
+            paginated_options_menu.Input(menu, 'up', true);
         elseif input.Direction == Dir8.DOWN then
-            menu.currentSelection = menu.currentSelection % #options + 1;
-            if menu.currentSelection == 0 then menu.currentSelection = #options end
-            while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
-                menu.currentSelection = menu.currentSelection % #options + 1;
-            end
-            _GAME:SE("Menu/Select");
-
-            if options[menu.currentSelection].description then
-                menu:SetDescription(options[menu.currentSelection].description.title, options[menu.currentSelection].description.content);
-            end
-            menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
-            menu.cursor:ResetTimeOffset();
+            paginated_options_menu.Input(menu, 'down', true);
         elseif input.Direction == Dir8.LEFT then
-            menu.currentPage = menu.currentPage - 1;
-            if menu.currentPage <= 0 then menu.currentPage = #menu.pages end
-            options = menu.pages[menu.currentPage].contents;
-            menu.currentSelection = 1;
-            while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
-                menu.currentSelection = menu.currentSelection % #options + 1;
-            end
-            _GAME:SE("Menu/Select");
-
-            menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
-            menu.cursor:ResetTimeOffset();
-
-            menu.pages[menu.currentPage]:Refresh();
-            menu:Rebuild();
+            paginated_options_menu.Input(menu, 'left', true);
         elseif input.Direction == Dir8.RIGHT then
-            menu.currentPage = menu.currentPage % #menu.pages + 1;
-            options = menu.pages[menu.currentPage].contents;
-            menu.currentSelection = 1;
-            while not options[menu.currentSelection].visible or not options[menu.currentSelection].selectable do
-                menu.currentSelection = menu.currentSelection % #options + 1;
-            end
-            _GAME:SE("Menu/Select");
-
-            menu.cursor.Loc = (options[menu.currentSelection].cursorAnchor or menu.cursor.Loc);
-            menu.cursor:ResetTimeOffset();
-
-            menu.pages[menu.currentPage]:Refresh();
-            menu:Rebuild();
+            paginated_options_menu.Input(menu, 'right', true);
         end
     end
 end

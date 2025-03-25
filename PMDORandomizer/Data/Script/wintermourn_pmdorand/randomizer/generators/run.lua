@@ -15,12 +15,13 @@ local function LogChangeMessage(message, first, second, firstName, secondName)
     end
 end
 
+---@param randomLabel mentoolkit.PaginatedOptions.Labelled
 return function(randomLabel, menu)
     --- Clear any existing randomization data.
     require 'wintermourn_pmdorand.randomizer.clear' (true);
     --- Precautionary cache initialization. We don't want ANY leftover data from previous generations.
     _DATA:InitDataIndices();
-    randomLabel.menuElements.right:SetText("[color=#aaaaaa][ Caching ]");
+    randomLabel:SetLabel('right', "[color=#aaaaaa][ Caching ]");
     coroutine.yield();
     --- Generate utility cache: data ids and groupings if necessary.
     require 'wintermourn_pmdorand.randomizer.utilitycache' .Cache();
@@ -126,8 +127,8 @@ return function(randomLabel, menu)
 
 
     if anythingRandomized == false then
-        randomLabel.menuElements.right:SetText("[color=#aaaaaa][ nothing happened ]");
+        randomLabel:SetLabel('right', "[color=#aaaaaa][ nothing happened ]");
     else
-        randomLabel.menuElements.right:SetText(' ');
+        randomLabel:SetLabel('right', ' ');
     end
 end

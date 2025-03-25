@@ -6,6 +6,8 @@ local CONST = {
     FUNCTION_EMPTY = function () end,
     REQUIRE_LATER = function (modname) return function() return require(modname) end end,
     PERFORM_LATER = function (modname) return function(...) return require(modname)(...) end end,
+    INVOKE = function (func) return function(...) return func(...) end end,
+    INVOKE_WITH = function (func, self) return function(...) return func(self, ...) end end,
     ---@param modname string
     ---@param ... any The path inside the returned value, assuming a table, to follow and execute like a function.
     ---@return function
@@ -20,8 +22,10 @@ local CONST = {
     end,
     Classes = {
         System = {
+            String = luanet.import_type('System.String'),
             Convert = luanet.import_type('System.Convert'),
             Object = luanet.import_type('System.Object'),
+            Array = luanet.import_type('System.Array'),
             BindingFlags = luanet.import_type('System.Reflection.BindingFlags'),
             Linq = {},
             Type = luanet.import_type('System.Type'),
@@ -60,7 +64,9 @@ local CONST = {
                 Divider = RogueEssence.Menu.MenuDivider
             }
         },
-        System = {Linq = {Enumerable = {
+        System = {
+            Regex = {},
+            Linq = {Enumerable = {
             ---@type fun(generic, enumerable: any): any
             ToArray = nil
         }}}
@@ -79,6 +85,16 @@ CONST.Methods.System.Linq.Enumerable.ToArray = function(generic, enumerable)
         "ToArray",
         CONST.Enums.BindingFlags.Convert(CONST.Enums.BindingFlags.Public | CONST.Enums.BindingFlags.Static)
     ):MakeGenericMethod(generic):Invoke(nil, luanet.make_array(System.Object, {enumerable}));
+end
+
+local type_String = System.Type.GetType("System.String");
+System.Regex = System.Type.GetType("System.Text.RegularExpressions.Regex, System.Text.RegularExpressions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
+CONST.Methods.System.Regex.Replace = function (string, pattern, replacement)
+    return System.Regex:GetMethod(
+        "Replace",
+        CONST.Enums.BindingFlags.Convert(CONST.Enums.BindingFlags.Public | CONST.Enums.BindingFlags.Static),
+        luanet.make_array(System.Type, {type_String, type_String, type_String})
+    ):Invoke(nil, luanet.make_array(System.String, {string, pattern, replacement}));
 end
 
 return CONST;

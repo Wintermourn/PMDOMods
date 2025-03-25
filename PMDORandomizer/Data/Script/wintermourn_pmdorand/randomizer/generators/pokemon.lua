@@ -120,7 +120,7 @@ pokemon_randomizer.Randomize = function ()
 
         rep = rep + 1;
         if rep > 50 then
-            data.updateRoutineUtils.menuOption.menuElements.right:SetText(string.format("[color=#aaaaaa]P".. digitTag .."/%s", i, max));
+            data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s", i, max));
             coroutine.yield(); rep = 0;
         end
     end

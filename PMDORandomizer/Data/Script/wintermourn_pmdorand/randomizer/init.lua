@@ -2,52 +2,51 @@
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 local CONST = require 'wintermourn_pmdorand.lib.constants'
     local perform = CONST.PERFORM_LATER;
+local data = require 'wintermourn_pmdorand.randomizer.data';
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
+local paginated_menu = require 'mentoolkit.menus.paginated_options'
 
 local randomizer = {
-    Data = require 'wintermourn_pmdorand.randomizer.data',
-    Menus = {
-        ---@type mentoolkit.Options?
-        Top_Menu = nil
-    }
+    menu = {},
+    Data = data
 }
 
-
+local topMenu;
 randomizer.OpenMenu = function ()
     local menu;
-    if randomizer.Menus.Top_Menu == nil then
-        randomizer.Menus.Top_Menu = options_menu(8,8,220,131);
-        menu = randomizer.Menus.Top_Menu;
-        ---@cast menu mentoolkit.Options
+    if topMenu == nil then
+        topMenu = paginated_menu(8,8,220,131);
+        menu = topMenu;
+        ---@cast menu mentoolkit.PaginatedOptions
         menu.title = "PMDO Randomizer v0.0";
-        menu.allowVerticalPageSwitch = false;
+        --menu.allowVerticalPageSwitch = false;
 
-        menu:AddButton("\n\n", require 'wintermourn_pmdorand.randomizer.pages.changelog').labels = {
-            left = "Version\n Heavily in-development,\n problems may arise.",
-            center = randomizer.Data.lastModified,
-            right = randomizer.Data.version
-        };
-        menu:AddSpacer(6)
-        menu:AddText("[color=#a0a0a0]Currently Randomized?").labels.right = "[color=#ff3030]Not Tracked[color]";
+        local frontPage = menu:AddPage();
+
+        frontPage:AddButton(STRINGS:FormatKey("pmdorand:wip"), require 'wintermourn_pmdorand.randomizer.pages.changelog')
+            :SetLabel('center', data.lastModified)
+            :SetLabel('right', data.version);
+        frontPage:AddSpacer(6)
+        frontPage:AddText("[color=#a0a0a0]Currently Randomized?"):SetLabel('right', "[color=#ff3030]Not Tracked[color]");
         --[[ menu:AddButton("\n", CONST.FUNCTION_EMPTY).labels = {
             left = "Enabled\n - no functionality",
             center = "test",
             right = "[color=#ffbebe]No[color]"
         }; ]]
-        local randomize = menu:AddButton("Randomize", CONST.FUNCTION_EMPTY);
+        local randomize = frontPage:AddButton("Randomize", CONST.FUNCTION_EMPTY):SetLabel('right', '');
         randomize.labels.right = '';
-        randomize.onSelected = function ()
-            randomize.menuElements.right:SetText('[color=#aaaaaa]working...');
+        randomize.actions.onSelected = function ()
+            randomize:SetLabel('right', '[color=#aaaaaa]working...');
             --- Run the randomizer as a coroutine. We don't want the game sitting there completely locked up.
             local c = coroutine.create(require 'wintermourn_pmdorand.randomizer.generators.run');
-            randomizer.Data.updateCoroutine = c;
+            data.updateCoroutine = c;
             --- Start generation coroutine and check for starting errors
             local output, error = coroutine.resume(c, randomize, menu);
             if not output and error then logger:err(error); end
         end
 
-        menu:AddButton("Clear Randomization", function ()
+        frontPage:AddButton("Clear Randomization", function ()
             local confirmation = _MENU:CreateQuestion(
                 STRINGS:FormatKey("pmdorand:top.clear"),
                 perform 'wintermourn_pmdorand.randomizer.clear',
@@ -55,23 +54,24 @@ randomizer.OpenMenu = function ()
             );
             _MENU:AddMenu(confirmation, false);
         end);
-        menu:PageBreak();
 
-        menu:AddHeader("[color=#aaaaaa]Generation");
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.seeding"), perform 'wintermourn_pmdorand.randomizer.pages.seeding');
-        menu:PageBreak();
+        local generationPage = topMenu:AddPage();
+        generationPage:AddHeader("[color=#aaaaaa]Generation");
+        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.seeding"), perform 'wintermourn_pmdorand.randomizer.pages.seeding');
+        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.save"), perform 'wintermourn_pmdorand.randomizer.pages.saved_options');
 
-        menu:AddHeader("[color=#aaaaaa]Randomization Options");
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.pokemon"), perform 'wintermourn_pmdorand.randomizer.pages.pokemon');
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.moves"), perform 'wintermourn_pmdorand.randomizer.pages.moves');
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.items"), perform 'wintermourn_pmdorand.randomizer.pages.items');
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.dungeons"), CONST.FUNCTION_EMPTY);
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.naming"), perform 'wintermourn_pmdorand.randomizer.pages.naming');
-        menu:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.statuses"), perform 'wintermourn_pmdorand.randomizer.pages.statuses');
+        local optionsPage = topMenu:AddPage();
+        optionsPage:AddHeader("[color=#aaaaaa]Randomization Options");
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.pokemon"), perform 'wintermourn_pmdorand.randomizer.pages.pokemon');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.moves"), perform 'wintermourn_pmdorand.randomizer.pages.moves');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.items"), perform 'wintermourn_pmdorand.randomizer.pages.items');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.dungeons"), CONST.FUNCTION_EMPTY);
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.naming"), perform 'wintermourn_pmdorand.randomizer.pages.naming');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.statuses"), perform 'wintermourn_pmdorand.randomizer.pages.statuses');
 
-        logger:debug("Mods path", randomizer.Data.mod.path);
+        randomizer.menu.top = topMenu;
     else
-        menu = randomizer.Menus.Top_Menu;
+        menu = topMenu;
     end
     ---@cast menu mentoolkit.Options
 
@@ -79,11 +79,7 @@ randomizer.OpenMenu = function ()
 end
 
 randomizer.Randomize = function ()
-    if not randomizer.Data.enabled and not randomizer.State.isRandomized then return end
-
-    if not randomizer.Data.enabled then
-        randomizer.UndoRandomization();
-    end
+    -- TODO
 end
 
 randomizer.UndoRandomization = function ()

@@ -1,5 +1,9 @@
 SpoilerLog.md
 
+# Saved Configs Folder
+Configs/Local/*
+Configs/Shared/*
+
 # Datagen Folders
 Data/Intrinsic
 Data/Monster

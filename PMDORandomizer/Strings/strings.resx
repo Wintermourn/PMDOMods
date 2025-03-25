@@ -58,6 +58,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="pmdorand:wip" xml:space="preserve">
+    <value>Version[br] Heavily in-development,[br] problems may arise.</value>
+  </data>
   <data name="pmdorand:topmenu" xml:space="preserve">
     <value>Randomizer</value>
     <comment>Label of the randomizer option on the title (top) menu.</comment>  
@@ -93,6 +96,10 @@
   <data name="pmdorand:top.statuses" xml:space="preserve">
     <value>Statuses</value>
     <comment>Label of the Status Effects menu option.</comment>  
+  </data>
+  <data name="pmdorand:top.save" xml:space="preserve">
+    <value>View Saved Options</value>
+    <comment>Label of the Save menu option.</comment>  
   </data>
   <data name="pmdorand:seed.clear" xml:space="preserve">
     <value>[color=#777777]Press `DELETE` to clear the selected seed.</value>
@@ -144,6 +151,27 @@
   <data name="pmdorand:pkmn.typing.retainment.description" xml:space="preserve">
     <value>Controls whether a Pokemon's first or second type should be kept during randomization.</value>
     <comment></comment>
+  </data>
+  <data name="pmdorand:pkmn.moves.rand.title" xml:space="preserve">
+    <value>Moveset Randomization</value>
+  </data>
+  <data name="pmdorand:pkmn.moves.rand.description" xml:space="preserve">
+    <value>Randomizes the moves that a Pokemon can learn and obtain.</value>
+  </data>
+  <data name="pmdorand:pkmn.moves.initialMoves.title" xml:space="preserve">
+    <value>Starting Move Count</value>
+  </data>
+  <data name="pmdorand:pkmn.moves.initialMoves.description" xml:space="preserve">
+    <value>The amount of moves that every Pokemon is guaranteed to have at Level 1.</value>
+  </data>
+  <data name="pmdorand:pkmn.moves.initialAttacks.title" xml:space="preserve">
+    <value>Guaranteed Starting Attacks</value>
+  </data>
+  <data name="pmdorand:pkmn.moves.initialAttacks.description" xml:space="preserve">
+    <value>The amount of starting moves that have to be physical or special attacks.</value>
+  </data>
+  <data name="pmdorand:save.name.title" xml:space="preserve">
+    <value>Choose a name.</value>
   </data>
   <data name="PMDOR_CHANGELOG_2025-03-23" xml:space="preserve">
     <value>

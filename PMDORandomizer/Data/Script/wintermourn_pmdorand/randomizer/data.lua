@@ -118,13 +118,14 @@ local data = {
     spoilerLog = nil,
     updateCoroutine = nil,
     updateRoutineUtils = {
-        ---@type table
+        ---@type mentoolkit.PaginatedOptions.Labelled
         menuOption = nil,
-        ---@type mentoolkit.Options
+        ---@type mentoolkit.PaginatedOptions
         menu = nil
     },
     mod = {}
 };
+local backup = require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(data.options);
 data.mod.header = RogueEssence.PathMod.GetModFromNamespace("wintermourn_pmdorand");
 data.mod.path = CONST.Classes.System.IO.Path.Combine(RogueEssence.PathMod.APP_PATH, data.mod.header.Path);
 
@@ -169,6 +170,10 @@ data.InitRNG = function ()
 
     randomGenerators.flattened['moves.values'] = setupGenerator(randomGenerators.moves, 'values', data.seeding.seeds.moves.values);
     randomGenerators.flattened['moves.ranges'] = setupGenerator(randomGenerators.moves, 'ranges', data.seeding.seeds.moves.ranges);
+end
+
+data.loadConfig = function (config)
+    data.options = require 'wintermourn_pmdorand.lib.table_merge' (require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(backup), config);
 end
 
 data.random = function (generator_index, min, max)

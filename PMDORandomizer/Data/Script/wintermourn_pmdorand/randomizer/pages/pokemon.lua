@@ -19,7 +19,7 @@ return function()
         pokemon_menu:AddSubmenuButton("Typing", perform 'wintermourn_pmdorand.randomizer.pages.submenus.pokemon.typing');
         pokemon_menu:AddSubmenuButton("Evolutions", CONST.FUNCTION_EMPTY);
         pokemon_menu:AddSubmenuButton("Stats", CONST.FUNCTION_EMPTY);
-        pokemon_menu:AddSubmenuButton("Movesets", CONST.FUNCTION_EMPTY);
+        pokemon_menu:AddSubmenuButton("Movesets", perform 'wintermourn_pmdorand.randomizer.pages.submenus.pokemon.movesets');
         pokemon_menu:AddSubmenuButton("Intrinsics", CONST.FUNCTION_EMPTY);
     end
     pokemon_menu:Open(true);

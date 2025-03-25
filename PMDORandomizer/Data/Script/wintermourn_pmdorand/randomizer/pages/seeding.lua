@@ -1,10 +1,13 @@
+---@diagnostic disable: inject-field, undefined-field
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
 local CONST = require 'wintermourn_pmdorand.lib.constants'
 local Data = require 'wintermourn_pmdorand.randomizer.data'
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
-local seeding_menu;
+local paginated_menu = require 'mentoolkit.menus.paginated_options'
+---@type mentoolkit.PaginatedOptions, mentoolkit.PaginatedOptions.Page;
+local seeding_menu, loose_seed_page;
 
 local function DisplayStringShared(var)
     return var ~= '' and '\''.. var ..'\'' or '[color=#aaaaaa]- Random -[color]'
@@ -14,8 +17,17 @@ local function DisplayString(var)
     return var ~= '' and '\''.. var ..'\'' or '[color=#aaaaaa]---[color]'
 end
 
+-- https://stackoverflow.com/a/1647577
+local function split(self)
+    local st, g = 1, self:gmatch("()(%.)")
+    local function getter(segs, seps, sep, cap1, ...)
+      st = sep and seps + #sep
+      return self:sub(segs, (seps or 0) - 1), cap1 or sep, ...
+    end
+    return function() if st then return getter(st, g()) end end
+  end
+
 local function SeedMenuCallback(seed, callback)
-    --local menu = RogueEssence.Menu.SeedInputMenu(callback, tonumber(seed, 16));
     local menu = RogueEssence.Menu.TeamNameMenu(
         STRINGS:FormatKey("INPUT_SEED_TITLE"),
         STRINGS:FormatKey("INPUT_CAN_PASTE"),
@@ -24,54 +36,86 @@ local function SeedMenuCallback(seed, callback)
     _MENU:AddMenu(menu, true);
 end
 
-local function SeedMenu(button, table, key)
+local function SeedMenu(button, path)
     return function ()
-        SeedMenuCallback(table[key], function (seed)
-            table[key] = seed;
-            button.labels.right = DisplayString(seed);
-            seeding_menu:Rebuild();
+        ---@type string|table
+        local target, lastSeg = Data.seeding, '';
+        for seg in split(path) do
+            if type(target[seg]) ~= "table" then lastSeg = seg; break end
+            target = target[seg];
+        end
+
+        SeedMenuCallback(target[lastSeg], function (seed)
+            target[lastSeg] = seed;
+            button:SetLabel('right', DisplayString(seed));
         end);
     end
 end
 
-local function SharedSeedMenu(button, table, key)
+local function SharedSeedMenu(button, path)
     return function ()
-        SeedMenuCallback(table[key], function (seed)
-            table[key] = seed;
-            button.labels.right = DisplayStringShared(seed);
-            seeding_menu:Rebuild();
+        ---@type string|table
+        local target, lastSeg = Data.seeding, '';
+        for seg in split(path) do
+            if type(target[seg]) ~= "table" then lastSeg = seg; break end
+            target = target[seg];
+        end
+
+        SeedMenuCallback(target[lastSeg], function (seed)
+            target[lastSeg] = seed;
+            button:SetLabel('right', DisplayString(seed));
         end);
     end
 end
 
-local function createButton(label, table, key)
-    local button = seeding_menu:AddButton(label, CONST.FUNCTION_EMPTY);
-    button.onSelected = SeedMenu(button, table, key);
-    button.labels.right = DisplayString(table[key]);
-    button.__seed = {table = table, key = key};
+local function createButton(label, path)
+    local button = loose_seed_page:AddButton(label, CONST.FUNCTION_EMPTY);
+    button.actions.onSelected = SeedMenu(button, path);
+    button:SetCallback('onRefresh', function (self)
+        ---@type string|table
+        local target, lastSeg = Data.seeding, '';
+        for seg in split(path) do
+            logger:debug(seg);
+            if type(target[seg]) ~= "table" then lastSeg = seg; break end
+            target = target[seg];
+        end
+
+        self:SetLabel('right', DisplayString(target[lastSeg]));
+    end)
+    button.__seed = {path = path};
 end
 
 local function createSharedButton()
-    local button = seeding_menu:AddButton("Shared Seed", CONST.FUNCTION_EMPTY);
-    button.onSelected = SharedSeedMenu(button, Data.seeding, 'shared_seed');
-    button.labels.right = DisplayStringShared(Data.seeding.shared_seed);
-    button.__seed = {table = Data.seeding, key = 'shared_seed', shared = true};
+    local button = loose_seed_page:AddButton("Shared Seed", CONST.FUNCTION_EMPTY);
+    button.actions.onSelected = SharedSeedMenu(button, 'shared_seed');
+    button:SetCallback('onRefresh', function (self)
+        self:SetLabel('right', DisplayStringShared(Data.seeding.shared_seed));
+    end)
+    button.__seed = {path = 'shared_seed', shared = true};
 end
 
 logger:debug(tostring(CONST.Classes.Xna.Keys.Delete));
 
----@param self mentoolkit.Options
+---@param self mentoolkit.PaginatedOptions
 ---@param input any
 ---@return boolean
 local function menu_input (self, input)
     if input:BaseKeyPressed(CONST.Classes.Xna.Keys.Delete) then
-        local currentOption = self.options[self.currentSelection];
+        local currentOption = self.pages[self.currentPage].contents[self.currentSelection];
         if currentOption.__seed ~= nil then
             _GAME:SE("Menu/Cancel");
-            currentOption.__seed.table[currentOption.__seed.key] = '';
-            currentOption.labels.right = (currentOption.__seed.shared and DisplayStringShared or DisplayString)
-                ( currentOption.__seed.table[currentOption.__seed.key] );
-            seeding_menu:Rebuild();
+            ---@type string|table
+            local target, lastSeg = Data.seeding, '';
+            for seg in split(currentOption.__seed.path) do
+                logger:debug(seg);
+                if type(target[seg]) ~= "table" then lastSeg = seg; break end
+                target = target[seg];
+            end
+    
+            target[lastSeg] = '';
+            currentOption:SetLabel('right', (currentOption.__seed.shared and DisplayStringShared or DisplayString)
+            ( target[lastSeg] ));
+            --seeding_menu:Rebuild();
             return true;
         end
     end
@@ -80,25 +124,27 @@ end
 
 return function()
     if seeding_menu == nil then
-        seeding_menu = options_menu(32,96,256,127);
+        seeding_menu = paginated_menu(32,96,256,127);
         seeding_menu.title = "Seeding"
         seeding_menu.onInput = menu_input;
 
-        seeding_menu:AddHeader(STRINGS:FormatKey("pmdorand:seed.clear"))
+        loose_seed_page = seeding_menu:AddPage();
+
+        loose_seed_page:AddHeader(STRINGS:FormatKey("pmdorand:seed.clear"))
         createSharedButton();
 
-        seeding_menu:AddSpacer(4);
+        loose_seed_page:AddSpacer(4);
 
-        createButton("Naming", Data.seeding.seeds, 'naming');
-        createButton("Items", Data.seeding.seeds, 'items');
-        createButton("Statuses", Data.seeding.seeds, 'statuses');
+        createButton("Naming", 'seeds.naming');
+        createButton("Items", 'seeds.items');
+        createButton("Statuses", 'seeds.statuses');
 
-        seeding_menu:PageBreak();
+        local second_page = seeding_menu:AddPage();
 
-        seeding_menu:AddHeader("[color=#aaaaaa]Submenus");
-        seeding_menu:AddSubmenuButton("Pokemon", CONST.FUNCTION_EMPTY);
-        seeding_menu:AddSubmenuButton("Dungeon", CONST.FUNCTION_EMPTY);
-        seeding_menu:AddSubmenuButton("Moves", CONST.FUNCTION_EMPTY);
+        second_page:AddHeader("[color=#aaaaaa]Submenus");
+        second_page:AddSubmenuButton("Pokemon", CONST.FUNCTION_EMPTY);
+        second_page:AddSubmenuButton("Dungeon", CONST.FUNCTION_EMPTY);
+        second_page:AddSubmenuButton("Moves", CONST.FUNCTION_EMPTY);
     end
     seeding_menu:Open(true);
 end
