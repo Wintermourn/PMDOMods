@@ -206,7 +206,7 @@ return function(x, y, w, h)
         pages = {}, global_elements = {}, currentPage = 1, __cache = {tick = 0}, scroll = 0, title = nil
     };
     o.__menu = RogueEssence.Menu.ScriptableMenu(x,y,w,h, function(i) controls_listener(o, i) end);
-    o.__menuElements = o.__menu.MenuElements;
+    o.__menuElements = o.__menu.Elements;
     setmetatable(o, textile_menu);
     return o
 end

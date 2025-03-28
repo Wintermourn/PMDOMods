@@ -19,7 +19,7 @@ randomizer.OpenMenu = function ()
         topMenu = paginated_menu(8,8,220,131);
         menu = topMenu;
         ---@cast menu mentoolkit.PaginatedOptions
-        menu.title = "PMDO Randomizer v0.0";
+        menu.title = "PMDO Randomizer ".. data.version;
         --menu.allowVerticalPageSwitch = false;
 
         local frontPage = menu:AddPage();

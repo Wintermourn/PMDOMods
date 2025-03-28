@@ -263,7 +263,7 @@ return function(x, y, w, h)
     };
     o.__menu = RogueEssence.Menu.ScriptableMenu(x,y,w,h, function(i) controls_listener(o, i) end);
     o.cursor = RogueEssence.Menu.MenuCursor(o.__menu);
-    o.__menuElements = o.__menu.MenuElements;
+    o.__menuElements = o.__menu.Elements;
     setmetatable(o, options_menu);
     return o
 end

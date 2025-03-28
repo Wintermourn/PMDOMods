@@ -185,7 +185,7 @@ function paginated_options_menu:AddDescriptionPanel(x,y,w,h)
     self.__description.titleObject = CONST.Functions.Menu.CreateText('', 10, 8);
     self.__description.descriptionObject = RogueEssence.Menu.DialogueText('', RogueElements.Rect(10, 25,w-16,h-33), 13);
 ---@diagnostic disable-next-line: undefined-field
-    local entries = self.__description.menu.MenuElements;
+    local entries = self.__description.menu.Elements;
     entries:Add(self.__description.titleObject);
     entries:Add(RogueEssence.Menu.MenuDivider(RogueElements.Loc(10,21), w - 20));
     entries:Add(self.__description.descriptionObject);
@@ -516,7 +516,7 @@ return function(x, y, w, h)
     };
     o.__menu = RogueEssence.Menu.ScriptableMenu(x,y,w,h, function(i) controls_listener(o, i) end);
     o.cursor = RogueEssence.Menu.MenuCursor(o.__menu);
-    o.__menuElements = o.__menu.MenuElements;
+    o.__menuElements = o.__menu.Elements;
     setmetatable(o, paginated_options_menu);
     return o
 end
