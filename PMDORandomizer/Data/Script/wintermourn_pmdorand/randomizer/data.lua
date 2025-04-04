@@ -60,6 +60,12 @@ local data = {
                 -- * not implemented
                 learnset = {
                     shuffleExisting = false,
+                },
+                -- * not implemented
+                typeMismatch = {
+                    allowed = true,
+                    rate =  0.20,
+                    limit = 0.90
                 }
             },
             intrinsics = {
@@ -67,7 +73,9 @@ local data = {
                 randomizationChance = 1,
                 --- Chance for an already blank ability slot to be filled (pokemon with less than three abilities can get up to three)
                 -- * not implemented
-                slotFillChance = 0
+                slotFillChance  = 0.50,
+                -- * not implemented
+                slotFillLimit   = 3
             }
         },
         moves = {
@@ -104,7 +112,10 @@ local data = {
             -- * not implemented
             category = {
                 enabled = true,
-                randomizationChance = 1
+                randomizationChance = 1,
+                --- When deciding a move's category, the randomizer chooses a number between 0 and 1.
+                -- If it's below this threshold, the move will be physical. Otherwise, it's special.
+                leaning = 0.5
             }
         },
         -- * not implemented
@@ -112,6 +123,82 @@ local data = {
             enabled = true,
             randomizationChance = 1,
             additionalRules = {} -- *
+        },
+        naming = {
+            enabled = true,
+            randomizationChance = 1,
+            global = {
+                enabled = nil,
+                -- * not implemented
+                randomizationChance = nil,
+                -- * not implemented
+                includeExistingNames = nil,
+                -- * not implemented
+                noDuplicateNames = nil,
+                customNames = {}
+            },
+            pokemon = {
+                enabled = true,
+                randomizationChance = 1,
+                includeExistingNames = true,
+                noDuplicateNames = true,
+                customNames = {
+                    unconditional = {
+                    },
+                    --[[ ---@type {[string]: string[]}
+                    typeBased = {} ]]
+                    conditional = {
+                        {
+                            conditions = {
+                                Element1 = "fire"
+                            },
+                            names = {
+                                "fred"
+                            }
+                        }
+                    }
+                }
+            },
+            -- * not implemented
+            items = {
+                enabled = true,
+                randomizationChance = 1,
+                includeExistingNames = false,
+                noDuplicateNames = true,
+                customNames = {
+                    unconditional = {},
+                    --[[ abilityBased = {
+                        healthRestoring = {},
+                        bellyRestoring  = {},
+                        ppRestoring  = {},
+                        damageDealing = {}
+                    },
+                    ---@type {[string]: string[]}
+                    itemStateBased = {} ]]
+                    conditional = {}
+                }
+            },
+            moves = {
+                enabled = true,
+                randomizationChance = 1,
+                includeExistingNames = true,
+                noDuplicateNames = true,
+                customNames = {
+                    unconditional = {},
+                    conditional = {}
+                }
+            },
+            -- * not implemented
+            abilities = {
+                enabled = true,
+                randomizationChance = 1,
+                includeExistingNames = false,
+                noDuplicateNames = true,
+                customNames = {
+                    unconditional = {},
+                    conditional = {}
+                }
+            }
         }
     },
     ---@type file*?
@@ -157,7 +244,7 @@ local function setupGenerator (table, key, seed)
 end
 
 data.InitRNG = function ()
-    randomGenerators.shared = rand.twister(hash(data.seeding.shared_seed or os.time()));
+    randomGenerators.shared = rand.twister(data.seeding.shared_seed ~= '' and hash(data.seeding.shared_seed) or os.time());
     randomGenerators.flattened['shared'] = randomGenerators.shared;
 
     randomGenerators.flattened['pokemon.moves'] = setupGenerator(randomGenerators.pokemon, 'moves', data.seeding.seeds.pokemon.moves);
@@ -226,6 +313,133 @@ data.language.toggle = function (bool)
 end
 data.language.descriptionText = function (key)
     return STRINGS:FormatKey(key ..".title"), (STRINGS:FormatKey(key ..".description"):gsub("%[br%]",'\n'))
+end
+
+---@param conditions table
+---@param conditionals table
+---@return {table: table, name: string}[]
+local getConditionalNames = function (conditions, conditionals)
+    local names = {};
+    local passed = true;
+    for _, set in pairs(conditionals) do
+        passed = true;
+        for name, condition in pairs(set.conditions) do
+            if type(condition) == 'table' then
+                passed = false;
+                for _, entry in pairs(condition) do
+                    if entry == conditions[name] then
+                        passed = true;
+                    end
+                end
+                if not passed then break end
+            else
+                if condition ~= conditions[name] then
+                    passed = false;
+                    break;
+                end
+            end
+        end
+        if passed then
+            for _, entry in pairs(set.nameIndexes) do
+                names[#names+1] = entry;
+            end
+        end
+    end
+    return names;
+end
+
+---@param existingNames {originalID: string, localization: table}[]
+data.createNamer = function (entries, options, existingNames)
+    local o = {
+        --- unconditional names
+        any = {},
+        --- conditional names
+        conditional = {},
+        --- preexisting names
+        existing = {},
+        --- list of existing ids whose names are already used, for `noDuplicateNames`
+        usedEntries = {}
+    }
+
+    for _, name in pairs(data.options.naming.global.customNames) do
+        o.any[#o.any+1] = name;
+    end
+    for _, name in pairs(entries.unconditional) do
+        o.any[#o.any+1] = name;
+    end
+
+    local cond;
+    for _, set in pairs(entries.conditional) do
+        cond = {
+            conditions = set.conditions,
+            names = set.names,
+            nameIndexes = {}
+        };
+        for _, name in pairs(cond.names) do
+            cond.nameIndexes[#cond.nameIndexes+1] = {
+                table = cond,
+                name = name
+            }
+        end
+
+        o.conditional[#o.conditional+1] = cond;
+    end
+
+    if options.includeExistingNames then
+        for _, entry in pairs(existingNames) do
+            o.existing[#o.existing+1] = entry;
+        end
+    end
+
+    local selection, availableConditionalNames;
+    if options.noDuplicateNames then
+        o.replacedNames = {};
+        local entry;
+        o.GetName = function (conditions, id)
+            availableConditionalNames = getConditionalNames(conditions, o.conditional);
+
+            if #o.any == 0 and #availableConditionalNames == 0 and #o.existing == 0 then return "<no name>" end
+            selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+            o.replacedNames[id] = true;
+
+            if selection > #o.any + #availableConditionalNames then
+                selection = selection - #o.any - #availableConditionalNames;
+                entry = o.existing[selection];
+                o.usedEntries[entry.originalID] = true;
+                table.remove(o.existing, selection);
+                return entry.name;
+            elseif selection > #o.any then
+                selection = selection - #o.any;
+                entry = availableConditionalNames[selection];
+                for i, k in pairs(entry.table.nameIndexes) do
+                    if k == entry then
+                        table.remove(entry.table.nameIndexes, i);
+                        break;
+                    end
+                end
+                return entry.name;
+            else
+                entry = o.any[selection];
+                table.remove(o.any, selection);
+                return entry;
+            end
+        end
+    else
+        o.GetName = function (conditions)
+            availableConditionalNames = getConditionalNames(conditions, o.conditional);
+            selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+
+            if selection > #o.any + #availableConditionalNames then
+                return o.existing[selection - #o.any - #availableConditionalNames];
+            elseif selection > #o.any then
+                return availableConditionalNames[selection - #o.any].name;
+            else
+                return o.any[selection];
+            end
+        end
+    end
+
+    return o;
 end
 
 return data;

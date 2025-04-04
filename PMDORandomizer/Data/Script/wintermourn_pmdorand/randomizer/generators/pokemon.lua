@@ -1,3 +1,4 @@
+local CONST = require 'wintermourn_pmdorand.lib.constants'
 local data = require 'wintermourn_pmdorand.randomizer.data'
 
 local ucache = require 'wintermourn_pmdorand.randomizer.utilitycache'
@@ -19,6 +20,8 @@ pokemon_randomizer.Randomize = function ()
     local guaranteedAttackStartingMoves = math.min(movesOptions.guaranteedStartingMoves, movesOptions.ensuredAttackingMoves);
     local guaranteedAnyStartingMoves = movesOptions.guaranteedStartingMoves - guaranteedAttackStartingMoves;
 
+    local pokemonNames = {};
+
     local typeList = data.typeBlacklist(ucache.elements, data.options.pokemon.typing.bannedTypes);
 
     for i, key in pairs(ucache.pokemon) do
@@ -28,6 +31,13 @@ pokemon_randomizer.Randomize = function ()
             data.spoilers.pokemon[#data.spoilers.pokemon+1] = {id = currentEntry.IndexNum, name = currentEntry.Name, skipped = true};
             --data.spoilerLog:write(string.format("* No. %04d | %s\n\tSKIPPED\n", currentEntry.IndexNum, currentEntry.Name:ToLocal()));
             goto skip_pokemon
+        end
+
+        if data.options.naming.pokemon.includeExistingNames then
+            pokemonNames[#pokemonNames+1] = {
+                originalID = key,
+                name = currentEntry.Name
+            };
         end
 
         localSpoiler = {
@@ -43,6 +53,14 @@ pokemon_randomizer.Randomize = function ()
                 name = currentForm.FormName
             };
             localSpoiler.forms[f+1] = form;
+
+            if data.options.naming.pokemon.includeExistingNames then
+                pokemonNames[#pokemonNames+1] = {
+                    originalID = key,
+                    formID = f,
+                    name = currentForm.FormName
+                };
+            end
 
             --- Pokemon Types
             -- Shuffles pokemon typing (1&2)
@@ -119,9 +137,58 @@ pokemon_randomizer.Randomize = function ()
         RogueEssence.Data.Serializer.SerializeDataAsDiff(monsterfolder .. key ..'.jsonpatch', originalMonsterFolder .. key ..'.json', currentEntry);
 
         rep = rep + 1;
-        if rep > 50 then
+        if rep > 20 then
             data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s", i, max));
             coroutine.yield(); rep = 0;
+        end
+    end
+
+    if data.options.naming.pokemon.enabled then
+        local nameRandomizer = data.createNamer(data.options.naming.pokemon.customNames, data.options.naming.pokemon, pokemonNames);
+        local pnameChance, nameChance = data.options.naming.pokemon.randomizationChance, data.options.naming.randomizationChance;
+        local nameDat;
+        for i, key in pairs(ucache.pokemon) do
+            currentEntry = _DATA:GetMonster(key);
+    
+            currentForm = currentEntry.Forms[0];
+            if data.randomizationChance(pnameChance, 'naming') and data.randomizationChance(nameChance, 'naming') then
+                nameDat = nameRandomizer.GetName({
+                    IsSpeciesName = true,
+                    Element1 = currentForm.Element1,
+                    Element2 = currentForm.Element2
+                }, key);
+
+                if CONST.Methods.IsLocalText(nameDat) then
+                    currentEntry.Name = nameDat;
+                else
+                    currentEntry.Name = RogueEssence.LocalText(nameDat);
+                end
+            end
+    
+            for f = 0, currentEntry.Forms.Count - 1 do
+                currentForm = currentEntry.Forms[f];
+    
+                if data.randomizationChance(pnameChance, 'naming') and data.randomizationChance(nameChance, 'naming') then
+                    nameDat = nameRandomizer.GetName({
+                        Element1 = currentForm.Element1,
+                        Element2 = currentForm.Element2
+                    }, key);
+    
+                    if CONST.Methods.IsLocalText(nameDat) then
+                        currentForm.FormName = nameDat;
+                    else
+                        currentForm.FormName = RogueEssence.LocalText(nameDat);
+                    end
+                end
+            end
+
+            RogueEssence.Data.Serializer.SerializeDataAsDiff(monsterfolder .. key ..'.jsonpatch', originalMonsterFolder .. key ..'.json', currentEntry);
+            
+            rep = rep + 1;
+            if rep > 20 then
+                data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]NP".. digitTag .."/%s", i, max));
+                coroutine.yield(); rep = 0;
+            end
         end
     end
 end

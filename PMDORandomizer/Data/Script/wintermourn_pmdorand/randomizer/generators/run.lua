@@ -54,18 +54,18 @@ return function(randomLabel, menu)
         data.spoilerLog:flush();
     end
 
-    logger:debug("pokemon");
-    if data.options.pokemon.enabled then
-        anythingRandomized = true;
-        __Directory.CreateDirectory(data.mod.path .. '/Data/Monster/');
-        require 'wintermourn_pmdorand.randomizer.generators.pokemon' .Randomize();
-    end
-
     logger:debug("moves");
     if data.options.moves.enabled then
         anythingRandomized = true;
         __Directory.CreateDirectory(data.mod.path .. '/Data/Skill/');
         require 'wintermourn_pmdorand.randomizer.generators.moves' .Randomize();
+    end
+
+    logger:debug("pokemon");
+    if data.options.pokemon.enabled then
+        anythingRandomized = true;
+        __Directory.CreateDirectory(data.mod.path .. '/Data/Monster/');
+        require 'wintermourn_pmdorand.randomizer.generators.pokemon' .Randomize();
     end
 
     if data.options.generateSpoilerLog then

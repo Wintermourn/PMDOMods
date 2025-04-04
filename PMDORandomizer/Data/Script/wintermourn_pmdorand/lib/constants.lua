@@ -35,6 +35,16 @@ local CONST = {
             Keys = luanet.import_type('Microsoft.Xna.Framework.Input.Keys')
         }
     },
+    PMDCDat = {
+        Events = {
+            HealthAffecting = {
+                RestoreHPEvent = luanet.ctype(PMDC.Dungeon.RestoreHPEvent)
+            },
+            StomachAffecting = {
+                RestoreBellyEvent = luanet.ctype(PMDC.Dungeon.RestoreBellyEvent)
+            }
+        }
+    },
     Enums = {
         ---@enum System.Reflection.BindingFlags
         BindingFlags = {
@@ -95,6 +105,14 @@ CONST.Methods.System.Regex.Replace = function (string, pattern, replacement)
         CONST.Enums.BindingFlags.Convert(CONST.Enums.BindingFlags.Public | CONST.Enums.BindingFlags.Static),
         luanet.make_array(System.Type, {type_String, type_String, type_String})
     ):Invoke(nil, luanet.make_array(System.String, {string, pattern, replacement}));
+end
+
+local type_LocalText = luanet.ctype(RogueEssence.LocalText);
+CONST.Methods.IsLocalText = function (object)
+    if type(object) == 'userdata' then
+        return type_LocalText:IsAssignableFrom(object:GetType());
+    end
+    return false;
 end
 
 return CONST;
