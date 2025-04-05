@@ -1,8 +1,8 @@
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local CONST = require 'pmdorand.lib.constants'
     local Environment = CONST.Classes.System.Environment;
-local data = require 'wintermourn_pmdorand.randomizer.data'
+local data = require 'pmdorand.randomizer.data'
 
-local ucache = require 'wintermourn_pmdorand.randomizer.utilitycache'
+local ucache = require 'pmdorand.randomizer.utilitycache'
 
 local item_randomizer = {
 }

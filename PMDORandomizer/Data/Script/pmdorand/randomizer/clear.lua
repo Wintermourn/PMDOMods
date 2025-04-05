@@ -1,5 +1,5 @@
-local data = require 'wintermourn_pmdorand.randomizer.data'
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local data = require 'pmdorand.randomizer.data'
+local CONST = require 'pmdorand.lib.constants'
 
 local jpatch = '.jsonpatch';
 local __Array = luanet.import_type('System.Array');

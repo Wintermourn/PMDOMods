@@ -1,10 +1,10 @@
 ---@diagnostic disable: undefined-global
 require 'origin.common'
 require 'origin.services.baseservice'
-local randomizer = require 'wintermourn_pmdorand.randomizer'
+local randomizer = require 'pmdorand.randomizer'
 
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
-local data = require 'wintermourn_pmdorand.randomizer.data';
+local data = require 'pmdorand.randomizer.data';
 
 local TMS = Class('TopMenuService', BaseService)
 local TMS_Shared = {

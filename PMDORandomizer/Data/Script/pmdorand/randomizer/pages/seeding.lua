@@ -1,8 +1,8 @@
 ---@diagnostic disable: inject-field, undefined-field
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
-local CONST = require 'wintermourn_pmdorand.lib.constants'
-local Data = require 'wintermourn_pmdorand.randomizer.data'
+local CONST = require 'pmdorand.lib.constants'
+local Data = require 'pmdorand.randomizer.data'
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
 local paginated_menu = require 'mentoolkit.menus.paginated_options'

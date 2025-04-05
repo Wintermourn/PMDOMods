@@ -1,8 +1,8 @@
 ---@diagnostic disable: undefined-global
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local CONST = require 'pmdorand.lib.constants'
     local perform = CONST.PERFORM_LATER;
-local data = require 'wintermourn_pmdorand.randomizer.data';
+local data = require 'pmdorand.randomizer.data';
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
 local paginated_menu = require 'mentoolkit.menus.paginated_options'
@@ -25,7 +25,7 @@ randomizer.OpenMenu = function ()
 
         local frontPage = menu:AddPage();
 
-        frontPage:AddButton(STRINGS:FormatKey("pmdorand:wip"), require 'wintermourn_pmdorand.randomizer.pages.changelog')
+        frontPage:AddButton(STRINGS:FormatKey("pmdorand:wip"), require 'pmdorand.randomizer.pages.changelog')
             :SetLabel('center', data.lastModified)
             :SetLabel('right', data.version);
         frontPage:AddSpacer(6)
@@ -41,7 +41,7 @@ randomizer.OpenMenu = function ()
             if data.lockRandomizerButton then return end
             randomize:SetLabel('right', '[color=#aaaaaa]working...');
             --- Run the randomizer as a coroutine. We don't want the game sitting there completely locked up.
-            local c = coroutine.create(require 'wintermourn_pmdorand.randomizer.generators.run');
+            local c = coroutine.create(require 'pmdorand.randomizer.generators.run');
             data.updateCoroutine = c;
             --- Start generation coroutine and check for starting errors
             local output, error = coroutine.resume(c, randomize, menu);
@@ -51,7 +51,7 @@ randomizer.OpenMenu = function ()
         frontPage:AddButton("Clear Randomization", function ()
             local confirmation = _MENU:CreateQuestion(
                 STRINGS:FormatKey("pmdorand:top.clear"),
-                perform 'wintermourn_pmdorand.randomizer.clear',
+                perform 'pmdorand.randomizer.clear',
                 CONST.FUNCTION_EMPTY
             );
             _MENU:AddMenu(confirmation, false);
@@ -59,17 +59,17 @@ randomizer.OpenMenu = function ()
 
         local generationPage = topMenu:AddPage();
         generationPage:AddHeader("[color=#aaaaaa]Generation");
-        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.seeding"), perform 'wintermourn_pmdorand.randomizer.pages.seeding');
-        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.save"), perform 'wintermourn_pmdorand.randomizer.pages.saved_options');
+        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.seeding"), perform 'pmdorand.randomizer.pages.seeding');
+        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.save"), perform 'pmdorand.randomizer.pages.saved_options');
 
         local optionsPage = topMenu:AddPage();
         optionsPage:AddHeader("[color=#aaaaaa]Randomization Options");
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.pokemon"), perform 'wintermourn_pmdorand.randomizer.pages.pokemon');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.moves"), perform 'wintermourn_pmdorand.randomizer.pages.moves');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.items"), perform 'wintermourn_pmdorand.randomizer.pages.items');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.pokemon"), perform 'pmdorand.randomizer.pages.pokemon');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.moves"), perform 'pmdorand.randomizer.pages.moves');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.items"), perform 'pmdorand.randomizer.pages.items');
         optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.dungeons"), CONST.FUNCTION_EMPTY);
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.naming"), perform 'wintermourn_pmdorand.randomizer.pages.naming');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.statuses"), perform 'wintermourn_pmdorand.randomizer.pages.statuses');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.naming"), perform 'pmdorand.randomizer.pages.naming');
+        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.statuses"), perform 'pmdorand.randomizer.pages.statuses');
 
         randomizer.menu.top = topMenu;
     else
@@ -77,7 +77,7 @@ randomizer.OpenMenu = function ()
     end
     ---@cast menu mentoolkit.Options
 
-    require 'wintermourn_pmdorand.randomizer.generators.ItemEffects' .LoadAll();
+    require 'pmdorand.randomizer.generators.ItemEffects' .LoadAll();
     menu:Open(true);
 end
 

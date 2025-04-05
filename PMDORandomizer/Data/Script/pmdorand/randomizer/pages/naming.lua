@@ -1,5 +1,5 @@
-local CONST = require 'wintermourn_pmdorand.lib.constants'
-local data = require 'wintermourn_pmdorand.randomizer.data'
+local CONST = require 'pmdorand.lib.constants'
+local data = require 'pmdorand.randomizer.data'
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
 local naming_menu;

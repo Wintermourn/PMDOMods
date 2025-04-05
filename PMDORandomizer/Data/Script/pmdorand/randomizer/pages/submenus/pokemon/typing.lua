@@ -1,5 +1,5 @@
 local paginated_options = require 'mentoolkit.menus.paginated_options'
-local data = require 'wintermourn_pmdorand.randomizer.data'
+local data = require 'pmdorand.randomizer.data'
 local menu = paginated_options(24, 56, 220, 115);
 menu.title = "Pokemon > Typing";
 menu:AddDescriptionPanel(0,185,320,55);

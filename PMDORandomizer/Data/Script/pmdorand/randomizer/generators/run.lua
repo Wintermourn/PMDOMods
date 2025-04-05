@@ -1,5 +1,5 @@
-local data = require 'wintermourn_pmdorand.randomizer.data'
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local data = require 'pmdorand.randomizer.data'
+local CONST = require 'pmdorand.lib.constants'
     local __Directory = CONST.Classes.System.IO.Directory;
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
@@ -20,13 +20,13 @@ return function(randomLabel, menu)
     data.lockRandomizerButton = true;
 
     --- Clear any existing randomization data.
-    require 'wintermourn_pmdorand.randomizer.clear' (true);
+    require 'pmdorand.randomizer.clear' (true);
     --- Precautionary cache initialization. We don't want ANY leftover data from previous generations.
     _DATA:InitDataIndices();
     randomLabel:SetLabel('right', "[color=#aaaaaa][ Caching ]");
     coroutine.yield();
     --- Generate utility cache: data ids and groupings if necessary.
-    require 'wintermourn_pmdorand.randomizer.utilitycache' .Cache();
+    require 'pmdorand.randomizer.utilitycache' .Cache();
     --- Set up number generators according to user specified seeds
     data.InitRNG()
     data.FireEvent('initrng');
@@ -64,7 +64,7 @@ return function(randomLabel, menu)
         anythingRandomized = true;
         __Directory.CreateDirectory(data.mod.path .. '/Data/Skill/');
         data.FireEvent('randomizing:moves/pre');
-        require 'wintermourn_pmdorand.randomizer.generators.moves' .Randomize();
+        require 'pmdorand.randomizer.generators.moves' .Randomize();
         data.FireEvent('randomizing:moves/post');
     end
 
@@ -73,7 +73,7 @@ return function(randomLabel, menu)
         anythingRandomized = true;
         __Directory.CreateDirectory(data.mod.path .. '/Data/Monster/');
         data.FireEvent('randomizing:pokemon/pre');
-        require 'wintermourn_pmdorand.randomizer.generators.pokemon' .Randomize();
+        require 'pmdorand.randomizer.generators.pokemon' .Randomize();
         data.FireEvent('randomizing:pokemon/post');
     end
 
@@ -82,7 +82,7 @@ return function(randomLabel, menu)
         anythingRandomized = true;
         __Directory.CreateDirectory(data.mod.path .. '/Data/Item/');
         data.FireEvent('randomizing:items/pre');
-        require 'wintermourn_pmdorand.randomizer.generators.items' .Randomize();
+        require 'pmdorand.randomizer.generators.items' .Randomize();
         data.FireEvent('randomizing:items/post');
     end
 

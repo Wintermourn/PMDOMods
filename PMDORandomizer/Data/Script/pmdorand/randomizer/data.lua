@@ -1,5 +1,5 @@
-local rand = require 'wintermourn_pmdorand.lib.pseudorandom'
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local rand = require 'pmdorand.lib.pseudorandom'
+local CONST = require 'pmdorand.lib.constants'
     local ItemEventRule = CONST.Enums.ItemEventRule;
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
@@ -259,8 +259,8 @@ local data = {
         }
     }
 };
-local backup = require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(data.options);
-data.mod.header = RogueEssence.PathMod.GetModFromNamespace("wintermourn_pmdorand");
+local backup = require 'pmdorand.lib.deepcopy' .deepcopy(data.options);
+data.mod.header = RogueEssence.PathMod.GetModFromNamespace("pmdorand");
 data.mod.path = CONST.Classes.System.IO.Path.Combine(RogueEssence.PathMod.APP_PATH, data.mod.header.Path);
 
 
@@ -307,7 +307,7 @@ data.InitRNG = function ()
 end
 
 data.loadConfig = function (config)
-    data.options = require 'wintermourn_pmdorand.lib.table_merge' (require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(backup), config);
+    data.options = require 'pmdorand.lib.table_merge' (require 'pmdorand.lib.deepcopy' .deepcopy(backup), config);
 end
 
 data.random = function (generator_index, min, max)
@@ -491,7 +491,7 @@ end
 
 data.AddItemEffectData = function (key, options)
     data.options.items.effects[key] = data.options.items.effects[key] or options;
-    backup.items.effects[key] = backup.items.effects[key] or require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(options);
+    backup.items.effects[key] = backup.items.effects[key] or require 'pmdorand.lib.deepcopy' .deepcopy(options);
 end
 
 data.AddEventCallback = function (event, fun)

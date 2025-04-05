@@ -1,9 +1,9 @@
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local CONST = require 'pmdorand.lib.constants'
     local __Directory = CONST.Classes.System.IO.Directory;
     local __Path = CONST.Classes.System.IO.Path;
     local __File = CONST.Classes.System.IO.File;
-local json = require 'wintermourn_pmdorand.lib.json'
-local data = require 'wintermourn_pmdorand.randomizer.data'
+local json = require 'pmdorand.lib.json'
+local data = require 'pmdorand.randomizer.data'
 local invokeWith = CONST.INVOKE_WITH;
 
 local CONFIGFOLDER = data.mod.path ..'/Configs/';
@@ -96,10 +96,10 @@ local function fill_save_menu()
         __Directory.CreateDirectory(CONFIGFOLDER_SHARED);
     end
 
-    local localfiles = __Directory.GetFiles(CONFIGFOLDER_LOCAL);
+    local files = __Directory.GetFiles(CONFIGFOLDER_LOCAL);
     local sortedFiles = {};
-    for i = 0, localfiles.Length - 1 do
-        sortedFiles[#sortedFiles+1] = {path = localfiles[i], lastModified = __File.GetLastWriteTime(localfiles[i])};
+    for i = 0, files.Length - 1 do
+        sortedFiles[#sortedFiles+1] = {path = files[i], lastModified = __File.GetLastWriteTime(files[i])};
     end
     table.sort(sortedFiles, function (a, b)
         return a.lastModified:CompareTo(b.lastModified) > 0;
@@ -144,6 +144,20 @@ local function fill_save_menu()
         page:AddHeader("[color=#aaaaaa]Local Sets");
     end
     page:AddButton("[color=#aaaaaa]-[color] Create New Set", create_local_save);
+
+    if #page.contents > 11 then
+        page = saves:AddPage();
+    end
+    page:AddHeader("[color=#aaaaaa]Shared Sets");
+
+    files = __Directory.GetFiles(CONFIGFOLDER_SHARED);
+    sortedFiles = {};
+    for i = 0, files.Length - 1 do
+        sortedFiles[#sortedFiles+1] = {path = files[i], lastModified = __File.GetLastWriteTime(files[i])};
+    end
+    table.sort(sortedFiles, function (a, b)
+        return a.lastModified:CompareTo(b.lastModified) > 0;
+    end)
 end
 
 m.fill_save_menu = fill_save_menu;

@@ -1,4 +1,4 @@
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local CONST = require 'pmdorand.lib.constants'
     local Convert = CONST.Classes.System.Convert;
 
 local DataType = RogueEssence.Data.DataManager.DataType;

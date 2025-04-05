@@ -1,4 +1,4 @@
-local CONST = require 'wintermourn_pmdorand.lib.constants'
+local CONST = require 'pmdorand.lib.constants'
 
 local options_menu = require 'mentoolkit.menus.reflowing_options'
 local statuses_menu;

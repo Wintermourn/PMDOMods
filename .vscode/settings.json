@@ -9,6 +9,7 @@
         "STRINGS",
         "_GAME",
         "_DATA",
-        "SV"
+        "SV",
+        "PMDC"
     ]
 }

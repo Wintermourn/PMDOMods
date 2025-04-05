@@ -7,4 +7,4 @@ wintermourn.pmdorand         Version 0.0         Created 2025-03-07
 By Wintermourn                                       Edit with care
 ]]
 
-require 'wintermourn_pmdorand.services.topmenuservice'
+require 'pmdorand.services.topmenuservice'

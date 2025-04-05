@@ -1,13 +1,13 @@
-local CONST = require 'wintermourn_pmdorand.lib.constants';
+local CONST = require 'pmdorand.lib.constants';
     local Environment = CONST.Classes.System.Environment;
-local data = require 'wintermourn_pmdorand.randomizer.data'
+local data = require 'pmdorand.randomizer.data'
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
 local __Type = CONST.Classes.System.Type;
 local type_BasePowerState = __Type.GetType('RogueEssence.Dungeon.BasePowerState, RogueEssence');
 logger:debug(type_BasePowerState.Name);
 
-local ucache = require 'wintermourn_pmdorand.randomizer.utilitycache'
+local ucache = require 'pmdorand.randomizer.utilitycache'
 
 local moves_randomizer = {}
 local skillfolder = data.mod.path .. '/Data/Skill/';

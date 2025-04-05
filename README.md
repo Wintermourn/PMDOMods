@@ -9,5 +9,5 @@ Comments in code are made assuming the use of vscode's [Lua Language Server](htt
 - #### [Menu Toolkit Library (`mentoolkit`)](Menu_Toolkit_Library/)
   Menu library used by PMDOR
 ### Content
-- #### [PMDO Randomizer (`wintermourn_pmdorand`)](PMDORandomizer/)
+- #### [PMDO Randomizer (`pmdorand`)](PMDORandomizer/)
   A work in progress randomizer for PMDO with options available on the top menu. Randomize Pokemon types, moves, and more.
