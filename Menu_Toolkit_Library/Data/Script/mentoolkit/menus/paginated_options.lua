@@ -16,6 +16,9 @@ local paginated_options_menu = {
     ---Title of the window, placed at the top automatically
     ---@type string
     title   = nil,
+    ---Requires `title` to not be nil.
+    ---@type boolean
+    showPageNumber = true,
     ---The currently viewed page. Refresh for the user with page:Rebuild().
     currentPage = 1,
     ---The currently selected option.
@@ -90,6 +93,15 @@ function paginated_options_menu:Rebuild ()
             self.__cache.hasTitle = true;
             self.__cache.globalElements.title = CONST.Functions.Menu.CreateText(self.title, 10, 8);
             self.__cache.globalElements.divider = RogueEssence.Menu.MenuDivider(RogueElements.Loc(10,21), mw- 20);
+        end
+        if self.showPageNumber then
+            if not self.__cache.hasPage then
+                self.__cache.hasPage = true;
+                self.__cache.globalElements.page =
+                    CONST.Functions.Menu.CreateText(string.format('(%s/%s)',self.currentPage,#self.pages), mw - 10, 8, DirH.RIGHT);
+            end
+            self.__cache.globalElements.page:SetText(string.format('(%s/%s)', self.currentPage, #self.pages));
+            self.__menuElements:Add(self.__cache.globalElements.page);
         end
         self.__menuElements:Add(self.__cache.globalElements.title);
         self.__menuElements:Add(self.__cache.globalElements.divider);
