@@ -1,9 +1,11 @@
 local rand = require 'wintermourn_pmdorand.lib.pseudorandom'
 local CONST = require 'wintermourn_pmdorand.lib.constants'
+    local ItemEventRule = CONST.Enums.ItemEventRule;
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
+---@class PMDOR.Data
 local data = {
-    version = "v0.1.0",
+    version = "v0.2.0",
     lastModified = "DEV",
     seeding = {
         shared_seed         = '',
@@ -118,6 +120,41 @@ local data = {
                 leaning = 0.5
             }
         },
+        items = {
+            enabled = true,
+            randomizationChance = 1,
+            pricing = {
+                enabled = true,
+                priceMode = CONST.Enums.PriceMode.RANDOMOFFSET
+            },
+            effects = {
+                enabled = true,
+                ---@type PMDOR.Conf.HealthRestoration
+                HealthRestoration = {
+                    enabled = true,
+                    appearanceChance = 0.1,
+                    disappearanceChance = 0,
+                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.USABLE_ONLY,
+                    flatHealing = false,
+                    minHealed = 0.01,
+                    maxHealed = 0.4
+                },
+                ---@type PMDOR.Conf.ItemEffect
+                PPRestoration = {
+                    enabled = true,
+                    appearanceChance = 0,
+                    disappearanceChance = 0,
+                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.USABLE_ONLY
+                },
+                ---@type PMDOR.Conf.ItemEffect
+                StatBuffing = {
+                    enabled = true,
+                    appearanceChance = 0,
+                    disappearanceChance = 0,
+                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.USABLE_ONLY
+                }
+            }
+        },
         -- * not implemented
         abilities = {
             enabled = true,
@@ -145,8 +182,6 @@ local data = {
                 customNames = {
                     unconditional = {
                     },
-                    --[[ ---@type {[string]: string[]}
-                    typeBased = {} ]]
                     conditional = {
                         {
                             conditions = {
@@ -154,6 +189,14 @@ local data = {
                             },
                             names = {
                                 "fred"
+                            }
+                        },
+                        {
+                            conditions = {
+                                Element1 = "water"
+                            },
+                            names = {
+                                "blue"
                             }
                         }
                     }
@@ -167,14 +210,6 @@ local data = {
                 noDuplicateNames = true,
                 customNames = {
                     unconditional = {},
-                    --[[ abilityBased = {
-                        healthRestoring = {},
-                        bellyRestoring  = {},
-                        ppRestoring  = {},
-                        damageDealing = {}
-                    },
-                    ---@type {[string]: string[]}
-                    itemStateBased = {} ]]
                     conditional = {}
                 }
             },

@@ -2,7 +2,7 @@ local CONST = require 'wintermourn_pmdorand.lib.constants'
     local __Directory = CONST.Classes.System.IO.Directory;
     local __Path = CONST.Classes.System.IO.Path;
     local __File = CONST.Classes.System.IO.File;
-local TOML = require 'wintermourn_pmdorand.lib.toml'
+local json = require 'wintermourn_pmdorand.lib.json'
 local data = require 'wintermourn_pmdorand.randomizer.data'
 local invokeWith = CONST.INVOKE_WITH;
 
@@ -31,9 +31,9 @@ local function save_local(filename, savename)
         configs = data.options
     };
 
-    local file = io.open(data.mod.path ..'/Configs/Local/'.. filename ..'.toml', 'w+');
+    local file = io.open(data.mod.path ..'/Configs/Local/'.. filename ..'.json', 'w+');
     if file then
-        file:write(string.format("name = \"%s\"\nversion = \"%s\"\n", savename, data.version) .. TOML.encode(savedata));
+        file:write(string.format("name = \"%s\"\nversion = \"%s\"\n", savename, data.version) .. json.encode(savedata));
         file:close();
         return true;
     end
@@ -48,11 +48,11 @@ local function create_local_save()
         130, os.date("%Y-%m-%d"), function (name)
             local finame = CONST.Methods.System.Regex.Replace(name, invalidChars, '_');
 
-            if __File.Exists(CONFIGFOLDER_LOCAL .. finame ..'.toml') then
+            if __File.Exists(CONFIGFOLDER_LOCAL .. finame ..'.json') then
                 local copName = 0;
                 repeat
                     copName = copName + 1;
-                until not __File.Exists(string.format("%s%s (%d).toml", CONFIGFOLDER_LOCAL, finame, copName));
+                until not __File.Exists(string.format("%s%s (%d).json", CONFIGFOLDER_LOCAL, finame, copName));
                 finame = finame .. ' ('.. copName ..')';
             end
             save_local(finame, name);
@@ -131,6 +131,7 @@ local function fill_save_menu()
             lineCount = lineCount + 1;
             if lineCount == 2 then break end
         end
+        if path:sub(-5) ~= '.json' then name = '[color=#ffaaaa]' .. name; end
         page:AddButton(name, function ()
             ctx_Data.filename = path;
             ctx_Data.local_save = true;
@@ -155,7 +156,11 @@ return function()
             local file = io.open(ctx_Data.filename, 'r');
 
             if file then
-                local dat = TOML.parse(file:read('a'));
+                --- skip first two lines
+                _ = file:read('l');
+                _ = file:read('l');
+
+                local dat = json.decode(file:read('a'));
                 file:close();
                 data.loadConfig(dat.configs);
                 data.seeding = dat.seeding;
@@ -170,7 +175,7 @@ return function()
         end);
         page:AddButton("Rename", CONST.FUNCTION_EMPTY);
         page:AddButton("Delete", function ()
-            if ctx_Data.filename ~= nil and __File.Exists(ctx_Data.filename) and string.sub(ctx_Data.filename,-5) == '.toml' then
+            if ctx_Data.filename ~= nil and __File.Exists(ctx_Data.filename) and string.sub(ctx_Data.filename,-5) == '.json' then
                 os.remove(ctx_Data.filename);
                 if saves.currentSelection > 1 and saves.pages[saves.currentPage].contents[saves.currentSelection - 1].selectable then
                     saves:Input('up');

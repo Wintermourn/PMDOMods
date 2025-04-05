@@ -4,7 +4,7 @@
   <Description>Provides extensive randomization options.</Description>
   <Namespace>wintermourn_pmdorand</Namespace>
   <UUID>B16CED41-5CAC-451B-BAA4-D1386A0A4415</UUID>
-  <Version>0.1</Version>
+  <Version>0.2</Version>
   <GameVersion>0.8.8</GameVersion>
   <ModType>Mod</ModType>
   <Relationships>

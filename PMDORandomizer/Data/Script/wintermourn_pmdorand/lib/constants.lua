@@ -54,6 +54,25 @@ local CONST = {
             Static  = 8,
             ---@type fun(integer): CSObject
             Convert = nil
+        },
+        ---@enum PMDOR.ItemEventRule
+        ItemEventRule = {
+            DENIED = 0,
+            --- The item has known positive effects.
+            RECOVERY    = 1,
+            --- The item has known negative effects.
+            HARMFUL     = 2,
+            --- The item can be "consumed" through the inventory.
+            USABLE_ONLY = 4
+        },
+        EventType = {
+            INSTANT     = 1
+        },
+        ---@enum PMDOR.PriceMode
+        PriceMode = {
+            RAWRANDOM       = 0,
+            RANDOMOFFSET    = 1,
+            EVENTBASED      = 2,
         }
     },
     Functions = {
