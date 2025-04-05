@@ -1,5 +1,5 @@
 local CONST = require 'wintermourn_pmdorand.lib.constants';
-
+    local Environment = CONST.Classes.System.Environment;
 local data = require 'wintermourn_pmdorand.randomizer.data'
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
@@ -22,6 +22,7 @@ moves_randomizer.Randomize = function ()
 
     local currentEntry, localSpoiler, basePowerState;
     local rep, max = 0, #ucache.moves.all;
+    local nextBreak = Environment.TickCount64+100;
     local maxlen = tostring(max):len();
     local digitTag = '%0'.. maxlen ..'d';
 
@@ -92,10 +93,9 @@ moves_randomizer.Randomize = function ()
 
         RogueEssence.Data.Serializer.SerializeDataAsDiff(skillfolder .. move.id ..'.jsonpatch', originalSkillFolder .. move.id ..'.json', currentEntry);
 
-        rep = rep + 1;
-        if rep > 50 then
+        if Environment.TickCount64 > nextBreak then
             data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]M".. digitTag .."/%s", i, max));
-            coroutine.yield(); rep = 0;
+            coroutine.yield(); nextBreak = Environment.TickCount64+100;
         end
     end
 
@@ -120,10 +120,9 @@ moves_randomizer.Randomize = function ()
 
             RogueEssence.Data.Serializer.SerializeDataAsDiff(skillfolder .. move.id ..'.jsonpatch', originalSkillFolder .. move.id ..'.json', currentEntry);
             
-            rep = rep + 1;
-            if rep > 20 then
+            if Environment.TickCount64 > nextBreak then
                 data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]NM".. digitTag .."/%s", i, max));
-                coroutine.yield(); rep = 0;
+                coroutine.yield(); nextBreak = Environment.TickCount64+100;
             end
         end
     end

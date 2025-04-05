@@ -1,3 +1,5 @@
+---@meta _
+
 ---@class PMDOR.Conf.Set
 ---@field enabled boolean
 ---@field randomizationChance number A random percentage (0.00-1.00) rolled to determine if randomization should succeed.

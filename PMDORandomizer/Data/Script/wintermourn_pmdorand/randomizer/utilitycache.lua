@@ -15,7 +15,8 @@ local utilitycache = {
     },
     intrinsics = {},
     pokemon = {},
-    statuses = {}
+    statuses = {},
+    items = {}
 }
 
 local cached = false;
@@ -77,6 +78,14 @@ utilitycache.Cache = function ()
     list = _DATA.DataIndices[DataType.Status]:GetOrderedKeys(true);
     for i = 0, list.Count - 1 do
         utilitycache.statuses[i + 1] = list[i];
+    end
+
+    --- Items
+    list = _DATA.DataIndices[DataType.Item]:GetOrderedKeys(true);
+    for i = 0, list.Count - 1 do
+        if _DATA.DataIndices[DataType.Item]:Get(list[i]).Released then
+            utilitycache.items[#utilitycache.items + 1] = list[i];
+        end
     end
 end
 

@@ -7,6 +7,7 @@ local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAN
 local data = {
     version = "v0.2.0",
     lastModified = "DEV",
+    lockRandomizerButton = false,
     seeding = {
         shared_seed         = '',
         seeds = {
@@ -130,11 +131,11 @@ local data = {
             effects = {
                 enabled = true,
                 ---@type PMDOR.Conf.HealthRestoration
-                HealthRestoration = {
+                _HealthRestoration = {
                     enabled = true,
                     appearanceChance = 0.1,
                     disappearanceChance = 0,
-                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.USABLE_ONLY,
+                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.EXCLUDE_EQUIPMENT,
                     flatHealing = false,
                     minHealed = 0.01,
                     maxHealed = 0.4
@@ -144,14 +145,14 @@ local data = {
                     enabled = true,
                     appearanceChance = 0,
                     disappearanceChance = 0,
-                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.USABLE_ONLY
+                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.EXCLUDE_EQUIPMENT
                 },
                 ---@type PMDOR.Conf.ItemEffect
                 StatBuffing = {
                     enabled = true,
                     appearanceChance = 0,
                     disappearanceChance = 0,
-                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.USABLE_ONLY
+                    appearanceRules = ItemEventRule.RECOVERY | ItemEventRule.EXCLUDE_EQUIPMENT
                 }
             }
         },
@@ -238,6 +239,7 @@ local data = {
     },
     ---@type file*?
     spoilerLog = nil,
+    spoilers = {},
     updateCoroutine = nil,
     updateRoutineUtils = {
         ---@type mentoolkit.PaginatedOptions.Labelled
@@ -245,7 +247,17 @@ local data = {
         ---@type mentoolkit.PaginatedOptions
         menu = nil
     },
-    mod = {}
+    mod = {},
+    eventbus = {
+        on = {},
+        once = {}
+    },
+    external = {
+        items = {
+            itemEffects = {},
+            itemEffectTypes = {}
+        }
+    }
 };
 local backup = require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(data.options);
 data.mod.header = RogueEssence.PathMod.GetModFromNamespace("wintermourn_pmdorand");
@@ -475,6 +487,91 @@ data.createNamer = function (entries, options, existingNames)
     end
 
     return o;
+end
+
+data.AddItemEffectData = function (key, options)
+    data.options.items.effects[key] = data.options.items.effects[key] or options;
+    backup.items.effects[key] = backup.items.effects[key] or require 'wintermourn_pmdorand.lib.deepcopy' .deepcopy(options);
+end
+
+data.AddEventCallback = function (event, fun)
+    if not data.eventbus.on[event] then data.eventbus.on[event] = {} end
+    data.eventbus.on[event][#data.eventbus.on[event]+1] = fun;
+end
+data.AddEventCallbackOnce = function (event, fun)
+    if not data.eventbus.once[event] then data.eventbus.once[event] = {} end
+    data.eventbus.once[event][#data.eventbus.once[event]+1] = fun;
+end
+data.RemoveEventCallback = function (event, fun)
+    if not data.eventbus.on[event] then return end
+    for i,k in pairs(data.eventbus.on[event]) do
+        if k == fun then
+            table.remove(data.eventbus.on[event], i);
+            return;
+        end
+    end
+end
+data.RemoveEventCallbackOnce = function (event, fun)
+    if not data.eventbus.once[event] then return end
+    for i,k in pairs(data.eventbus.once[event]) do
+        if k == fun then
+            table.remove(data.eventbus.once[event], i);
+            return;
+        end
+    end
+end
+data.FireEvent = function (event, ...)
+    if data.eventbus.once[event] then
+        for _,k in pairs(data.eventbus.once[event]) do
+            k(...)
+        end
+        data.eventbus.once[event] = {};
+    end
+    if data.eventbus.on[event] then
+        for _,k in pairs(data.eventbus.on[event]) do
+            k(...)
+        end
+    end
+end
+
+---@generic options
+---@param id string
+---@param onItemRandomized fun(target: userdata, config: table, data: PMDOR.Data)
+---@param settings `options`
+---@return {onItemRandomized: function, options: options}
+data.AddItemEffect = function (id, onItemRandomized, settings)
+    local o = {
+        onItemRandomized = onItemRandomized
+    }
+    o.__index = function (self, index)
+        if index == "options" then return data.options.items.effects[id]; end
+        return rawget(self, index);
+    end
+    data.AddItemEffectData(id, {
+        enabled = false,
+        appearanceChance = 1.0,
+        appearanceRules = 0,
+        disappearanceChance = 0.0,
+        settings = settings
+    });
+    setmetatable(o, o);
+
+    data.external.items.itemEffects[id] = o;
+    return o;
+end
+
+local type_BattleEvent = luanet.ctype(RogueEssence.Dungeon.BattleEvent);
+---@param rule PMDOR.ItemEventRule
+data.SetEffectType = function (effectClass, rule)
+    if type(effectClass) ~= 'userdata' or not luanet.ctype(effectClass) or not luanet.ctype(effectClass):IsSubclassOf(type_BattleEvent) then
+        logger:err(("SetEffectType parameter effectClass (value %s) does not extend C# abstract class BattleEvent"):format(tostring(effectClass)));
+        return
+    end
+    if type(rule) ~= 'number' then
+        logger:err(("SetEffectType parameter rule (value %s) should be a number but isn't"):format(tostring(rule)));
+        return
+    end
+    data.external.items.itemEffectTypes[effectClass] = rule;
 end
 
 return data;

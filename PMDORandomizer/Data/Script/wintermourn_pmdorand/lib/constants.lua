@@ -29,7 +29,8 @@ local CONST = {
             BindingFlags = luanet.import_type('System.Reflection.BindingFlags'),
             Linq = {},
             Type = luanet.import_type('System.Type'),
-            IO = luanet.namespace('System.IO')
+            IO = luanet.namespace('System.IO'),
+            Environment = luanet.import_type('System.Environment')
         },
         Xna = {
             Keys = luanet.import_type('Microsoft.Xna.Framework.Input.Keys')
@@ -62,8 +63,10 @@ local CONST = {
             RECOVERY    = 1,
             --- The item has known negative effects.
             HARMFUL     = 2,
-            --- The item can be "consumed" through the inventory.
-            USABLE_ONLY = 4
+            --- Denies items that can be used/consumed (e.g. berries)
+            EXCLUDE_USABLE = 4,
+            --- Denies items that are equipped/held (e.g. Mobile Scarf)
+            EXCLUDE_EQUIPMENT = 8
         },
         EventType = {
             INSTANT     = 1

@@ -20,6 +20,7 @@ randomizer.OpenMenu = function ()
         menu = topMenu;
         ---@cast menu mentoolkit.PaginatedOptions
         menu.title = "PMDO Randomizer ".. data.version;
+        menu.showPageNumber = true;
         --menu.allowVerticalPageSwitch = false;
 
         local frontPage = menu:AddPage();
@@ -37,6 +38,7 @@ randomizer.OpenMenu = function ()
         local randomize = frontPage:AddButton("Randomize", CONST.FUNCTION_EMPTY):SetLabel('right', '');
         randomize.labels.right = '';
         randomize.actions.onSelected = function ()
+            if data.lockRandomizerButton then return end
             randomize:SetLabel('right', '[color=#aaaaaa]working...');
             --- Run the randomizer as a coroutine. We don't want the game sitting there completely locked up.
             local c = coroutine.create(require 'wintermourn_pmdorand.randomizer.generators.run');
@@ -75,6 +77,7 @@ randomizer.OpenMenu = function ()
     end
     ---@cast menu mentoolkit.Options
 
+    require 'wintermourn_pmdorand.randomizer.generators.ItemEffects' .LoadAll();
     menu:Open(true);
 end
 

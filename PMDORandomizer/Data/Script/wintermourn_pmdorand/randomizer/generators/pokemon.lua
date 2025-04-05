@@ -1,4 +1,5 @@
 local CONST = require 'wintermourn_pmdorand.lib.constants'
+    local Environment = CONST.Classes.System.Environment;
 local data = require 'wintermourn_pmdorand.randomizer.data'
 
 local ucache = require 'wintermourn_pmdorand.randomizer.utilitycache'
@@ -12,9 +13,12 @@ pokemon_randomizer.Randomize = function ()
     data.spoilers.pokemon = {};
 
     local currentEntry, currentForm, form, move, localSpoiler;
-    local rep, max = 0, #ucache.pokemon;
+    
+    local max = #ucache.pokemon;
     local maxlen = tostring(max):len();
     local digitTag = '%0'.. maxlen ..'d';
+    local nextBreak = Environment.TickCount64+100;
+
     local options = data.options.pokemon;
     local movesOptions = data.options.pokemon.moves;
     local guaranteedAttackStartingMoves = math.min(movesOptions.guaranteedStartingMoves, movesOptions.ensuredAttackingMoves);
@@ -136,10 +140,9 @@ pokemon_randomizer.Randomize = function ()
 
         RogueEssence.Data.Serializer.SerializeDataAsDiff(monsterfolder .. key ..'.jsonpatch', originalMonsterFolder .. key ..'.json', currentEntry);
 
-        rep = rep + 1;
-        if rep > 20 then
+        if Environment.TickCount64 > nextBreak then
             data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s", i, max));
-            coroutine.yield(); rep = 0;
+            coroutine.yield(); nextBreak = Environment.TickCount64+100;
         end
     end
 
@@ -184,10 +187,9 @@ pokemon_randomizer.Randomize = function ()
 
             RogueEssence.Data.Serializer.SerializeDataAsDiff(monsterfolder .. key ..'.jsonpatch', originalMonsterFolder .. key ..'.json', currentEntry);
             
-            rep = rep + 1;
-            if rep > 20 then
+            if Environment.TickCount64 > nextBreak then
                 data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]NP".. digitTag .."/%s", i, max));
-                coroutine.yield(); rep = 0;
+                coroutine.yield(); nextBreak = Environment.TickCount64+100;
             end
         end
     end

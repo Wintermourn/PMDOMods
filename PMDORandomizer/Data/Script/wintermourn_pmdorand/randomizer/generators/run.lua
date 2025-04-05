@@ -17,6 +17,8 @@ end
 
 ---@param randomLabel mentoolkit.PaginatedOptions.Labelled
 return function(randomLabel, menu)
+    data.lockRandomizerButton = true;
+
     --- Clear any existing randomization data.
     require 'wintermourn_pmdorand.randomizer.clear' (true);
     --- Precautionary cache initialization. We don't want ANY leftover data from previous generations.
@@ -27,6 +29,7 @@ return function(randomLabel, menu)
     require 'wintermourn_pmdorand.randomizer.utilitycache' .Cache();
     --- Set up number generators according to user specified seeds
     data.InitRNG()
+    data.FireEvent('initrng');
 
     local anythingRandomized = false;
 
@@ -39,6 +42,7 @@ return function(randomLabel, menu)
         data.spoilerLog:write("# PMDORandomizer Spoiler Log\n");
         data.spoilerLog:write("\n**Randomizer Version:** ".. data.version .." (".. data.lastModified ..")\n");
         data.spoilerLog:write("**Game Version:** ".. RogueEssence.Versioning.GetVersion():ToString() ..'\n\n');
+        data.FireEvent('spoiler:seeds/pre');
         data.spoilerLog:write("## Seeds\n\n")
         data.spoilerLog:write("* **Fallback (Shared) Seed:** ".. DisplayString(data.seeding.shared_seed) ..'\n');
         data.spoilerLog:write("* Naming Seed: ".. DisplayString(data.seeding.seeds.naming) ..'\n');
@@ -50,6 +54,7 @@ return function(randomLabel, menu)
         data.spoilerLog:write("* **Move Seeds:**\n  * Values:    ".. DisplayString(data.seeding.seeds.moves.values) ..'\n');
         data.spoilerLog:write("  * Ranges:    ".. DisplayString(data.seeding.seeds.moves.ranges) ..'\n');
         data.spoilerLog:write('\n');
+        data.FireEvent('spoiler:seeds/post');
     
         data.spoilerLog:flush();
     end
@@ -58,19 +63,34 @@ return function(randomLabel, menu)
     if data.options.moves.enabled then
         anythingRandomized = true;
         __Directory.CreateDirectory(data.mod.path .. '/Data/Skill/');
+        data.FireEvent('randomizing:moves/pre');
         require 'wintermourn_pmdorand.randomizer.generators.moves' .Randomize();
+        data.FireEvent('randomizing:moves/post');
     end
 
     logger:debug("pokemon");
     if data.options.pokemon.enabled then
         anythingRandomized = true;
         __Directory.CreateDirectory(data.mod.path .. '/Data/Monster/');
+        data.FireEvent('randomizing:pokemon/pre');
         require 'wintermourn_pmdorand.randomizer.generators.pokemon' .Randomize();
+        data.FireEvent('randomizing:pokemon/post');
+    end
+
+    logger:debug("items");
+    if data.options.items.enabled then
+        anythingRandomized = true;
+        __Directory.CreateDirectory(data.mod.path .. '/Data/Item/');
+        data.FireEvent('randomizing:items/pre');
+        require 'wintermourn_pmdorand.randomizer.generators.items' .Randomize();
+        data.FireEvent('randomizing:items/post');
     end
 
     if data.options.generateSpoilerLog then
         logger:debug("spoiler log output");
+        data.FireEvent('spoiler:postrandom');
         if data.spoilers.pokemon then
+            data.FireEvent('spoiler:pokemon/pre');
             data.spoilerLog:write("## Pokemon Randomization\n");
             for i,k in pairs(data.spoilers.pokemon) do
                 if k.skipped then
@@ -98,9 +118,11 @@ return function(randomLabel, menu)
     
                 ::SKIP_POKEMON_LOG::
             end
+            data.FireEvent('spoiler:pokemon/post');
         end
     
         if data.spoilers.moves then
+            data.FireEvent('spoiler:moves/pre');
             data.spoilerLog:write("\n## Move Randomization\n");
             for i,k in pairs(data.spoilers.moves) do
                 if k.skipped then
@@ -118,8 +140,10 @@ return function(randomLabel, menu)
     
                 ::SKIP_MOVE_LOG::
             end
+            data.FireEvent('spoiler:moves/post');
         end
     
+        data.FireEvent('spoiler:end');
         data.spoilerLog:flush();
         data.spoilerLog:close();
     end
@@ -131,4 +155,6 @@ return function(randomLabel, menu)
     else
         randomLabel:SetLabel('right', ' ');
     end
+
+    data.lockRandomizerButton = false;
 end
