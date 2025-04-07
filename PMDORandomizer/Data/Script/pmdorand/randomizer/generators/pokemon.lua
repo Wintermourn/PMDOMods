@@ -146,7 +146,7 @@ pokemon_randomizer.Randomize = function ()
         end
     end
 
-    if data.options.naming.pokemon.enabled then
+    if data.options.naming.enabled and data.options.naming.pokemon.enabled then
         local nameRandomizer = data.createNamer(data.options.naming.pokemon.customNames, data.options.naming.pokemon, pokemonNames);
         local pnameChance, nameChance = data.options.naming.pokemon.randomizationChance, data.options.naming.randomizationChance;
         local nameDat;

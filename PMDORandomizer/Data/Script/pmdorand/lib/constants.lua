@@ -58,15 +58,17 @@ local CONST = {
         },
         ---@enum PMDOR.ItemEventRule
         ItemEventRule = {
-            DENIED = 0,
+            DENIED              = 0,
             --- The item has known positive effects.
-            RECOVERY    = 1,
+            BENEFICIAL          = 1,
+            --- The item has recovery effects (HP, PP, Belly, ...)
+            HEALING             = 2,
             --- The item has known negative effects.
-            HARMFUL     = 2,
+            HARMFUL             = 4,
             --- Denies items that can be used/consumed (e.g. berries)
-            EXCLUDE_USABLE = 4,
+            EXCLUDE_USABLE      = 8,
             --- Denies items that are equipped/held (e.g. Mobile Scarf)
-            EXCLUDE_EQUIPMENT = 8
+            EXCLUDE_EQUIPMENT   = 16
         },
         EventType = {
             INSTANT     = 1

@@ -6,6 +6,7 @@ Configs/Shared/*
 
 # Datagen Folders
 Data/Intrinsic
+Data/Item
 Data/Monster
 Data/Skill
 Data/Status

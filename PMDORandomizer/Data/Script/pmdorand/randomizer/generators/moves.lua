@@ -99,7 +99,7 @@ moves_randomizer.Randomize = function ()
         end
     end
 
-    if data.options.naming.moves.enabled then
+    if data.options.naming.enabled and data.options.naming.moves.enabled then
         local nameRandomizer = data.createNamer(data.options.naming.moves.customNames, data.options.naming.moves, moveNames);
         local mnameChance, nameChance = data.options.naming.moves.randomizationChance, data.options.naming.randomizationChance;
         local nameDat;
