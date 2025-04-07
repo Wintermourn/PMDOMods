@@ -1,8 +1,9 @@
 local CONST = require 'pmdorand.lib.constants'
     local Environment = CONST.Classes.System.Environment;
+    local ItemEventRule = CONST.Enums.ItemEventRule;
 local data = require 'pmdorand.randomizer.data'
 local switch = require 'pmdorand.lib.switchcaser'
-local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
+local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
 local ucache = require 'pmdorand.randomizer.utilitycache'
 
@@ -37,10 +38,20 @@ local function scanEvent (flags, event, destroyer)
         knownTypesWithBaseEventField[eventType] = baseEventField ~= nil;
     end
 
+    if data.external.items.itemEffectTypes[eventType] then
+        local rule = data.external.items.itemEffectTypes[eventType];
+        if rule ~= nil then
+            if rule & CONST.Enums.ItemEventRule.BENEFICIAL then
+                flags.beneficial = true;
+            elseif rule & CONST.Enums.ItemEventRule.HARMFUL then
+                flags.harmful = true;
+            end
+        end
+    end
+
     if knownTypesWithBaseEventField[eventType] then
         scanEvent(flags, event.BaseEvent, destroyer);
     else
-        logger:debug(tostring(eventType))
         for i, k in pairs(data.external.items.itemEffects) do
             if k.types[eventType] then
                 k.onItemRandomized(
@@ -57,6 +68,15 @@ local function scanEvent (flags, event, destroyer)
             end
         end
     end
+end
+
+local function testRules(traits, rules)
+    if rules == 0 then return false end
+    if (rules & ItemEventRule.EXCLUDE_USABLE) > 0 and traits.consumable then return false end
+    if (rules & ItemEventRule.EXCLUDE_EQUIPMENT) > 0 and traits.equipable then return false end
+    if (rules & ItemEventRule.BENEFICIAL) > 0 and not traits.beneficial then return false end
+    if (rules & ItemEventRule.HARMFUL) > 0 and not traits.harmful then return false end
+    return true;
 end
 
 item_randomizer.Randomize = function ()
@@ -121,6 +141,23 @@ item_randomizer.Randomize = function ()
                         end)
                     end
                 end
+            end
+        end
+
+        local appearanceRule;
+        for id, k in pairs(data.external.items.itemEffects) do
+            appearanceRule = data.options.items.effects[id].appearanceRules;
+            if testRules(itemTraits, appearanceRule) then
+                k.onItemRandomized(
+                    ---@type PMDOR.ItemEvent.Target
+                    {
+                        isItem = true,
+                        isEvent = false,
+                        object = currentEntry
+                    },
+                    data.options.items.effects[id],
+                    data
+                );
             end
         end
 

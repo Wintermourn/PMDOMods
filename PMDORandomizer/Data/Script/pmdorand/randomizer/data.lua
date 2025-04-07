@@ -551,9 +551,9 @@ data.SetEffectType = function (effectClass, rule)
 		return
 	end
 	if LUA_ENGINE:TypeOf(effectClass) == type_Type and effectClass:IsSubclassOf(type_BattleEvent) then
-		data.external.items.itemEffectTypes[effectClass] = true;
+		data.external.items.itemEffectTypes[effectClass] = rule;
 	elseif luanet.ctype(effectClass) and luanet.ctype(effectClass):IsSubclassOf(type_BattleEvent) then
-		data.external.items.itemEffectTypes[luanet.ctype(effectClass)] = true;
+		data.external.items.itemEffectTypes[luanet.ctype(effectClass)] = rule;
 	else
 		logger:err(("SetEffectType parameter effectClass (value %s) does not extend C# abstract class BattleEvent"):format(tostring(effectClass)));
 	end

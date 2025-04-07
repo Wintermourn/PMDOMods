@@ -1,5 +1,6 @@
 local CONST = require 'pmdorand.lib.constants'
     local ItemEventRule = CONST.Enums.ItemEventRule;
+local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
 require 'pmdorand.randomizer.data' .AddItemEffect(
     --- Effect Data name (this is stored in the save file)
@@ -13,7 +14,17 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
         -- This is only true once per item
         if target.isItem then
             if not data.randomizationChance(config.appearanceChance, 'items') then return end
-            -- * TODO: Event Inserting Code
+            logger:debug("This would generate a new RestoreHPEvent!")
+            target.object.UseEvent.OnHits:Add(1, PMDC.Dungeon.RestoreHPEvent(
+                data.randomPower(
+                    'items',
+                    0, config.settings.appearanceSettings.maxRestorePercentage * 100,
+                    config.settings.appearanceSettings.restoreLeaningPercentage * 100,
+                    config.settings.appearanceSettings.restoreLeaningStrength
+                ),
+                100,
+                false
+            ));
         -- This is only true if one of the above events are found on the item
         elseif target.isEvent then
             if data.randomizationChance(config.disappearanceChance, 'items') then
@@ -39,9 +50,13 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
     --- Effect config data (these are stored in the save file and can be accessed by the function above)
     {
         flatDifference = false,
-        maxDifference = 0.2
+        maxDifference = 0.2,
+        appearanceSettings = {
+            maxRestorePercentage = 0.5,
+            restoreLeaningPercentage = 0.2,
+            restoreLeaningStrength = 0.5
+        }
     }
 )
 
--- * Currently unused, will be for restricting effects to certain item types
 require 'pmdorand.randomizer.data' .SetEffectType(PMDC.Dungeon.RestoreHPEvent, ItemEventRule.BENEFICIAL | ItemEventRule.HEALING);
