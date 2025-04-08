@@ -146,6 +146,7 @@ return function(randomLabel, menu)
 
     logger:debug("index");
     randomLabel:SetLabel('right', "[color=#aaaaaa][ Indexing ]");
+    coroutine.yield();
     CreateIndex(DataType.Item);
     CreateIndex(DataType.Skill);
     CreateIndex(DataType.Monster);

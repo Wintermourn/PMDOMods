@@ -30,7 +30,9 @@ pokemon_randomizer.Randomize = function ()
 
     local sub_moveset = require 'pmdorand.randomizer.generators.sub.pokemon.moveset';
     sub_moveset.InitializeVariables();
-    for i, key in pairs(ucache.pokemon) do
+
+    --- PASS 1
+    for i, key in ipairs(ucache.pokemon) do
         currentEntry = _DATA:GetMonster(key);
 
         if not data.randomizationChance(options.randomizationChance, 'shared') then
@@ -137,8 +139,52 @@ pokemon_randomizer.Randomize = function ()
         RogueEssence.Data.Serializer.SerializeDataAsDiff(monsterfolder .. key ..'.jsonpatch', originalMonsterFolder .. key ..'.json', currentEntry);
 
         if Environment.TickCount64 > nextBreak then
-            data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s", i, max));
+            data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s|1", i, max));
             coroutine.yield(); nextBreak = Environment.TickCount64+100;
+        end
+    end
+
+    --- PASS 2: Base Stats
+    if options.baseStats.enabled then
+        for i, key in pairs(ucache.pokemon) do
+            currentEntry = _DATA:GetMonster(key);
+            if data.spoilers.pokemon[i].skipped then goto skip_pass2; end
+
+            for f = 0, currentEntry.Forms.Count - 1 do
+                currentForm = currentEntry.Forms[f];
+
+                if options.baseStats.enabled and data.randomizationChance(options.baseStats.randomizationChance, 'pokemon.stats') then
+                    for stat, config in pairs{
+                        BaseHP = options.baseStats.health,
+                        BaseAtk = options.baseStats.attack,
+                        BaseDef = options.baseStats.defense,
+                        BaseMAtk = options.baseStats.spAttack,
+                        BaseMDef = options.baseStats.spDefense,
+                        BaseSpeed = options.baseStats.speed,
+                    } do
+                        if config.enabled and data.randomizationChance(config.randomizationChance, 'pokemon.stats') then
+                            currentForm[stat] = data.randomPower(
+                                'pokemon.stats',
+                                math.max(config.minimum, currentForm[stat] * (1- config.maximumDifference)),
+                                math.min(config.maximum, currentForm[stat] * (1+ config.maximumDifference)),
+                                currentForm[stat],
+                                config.originalPullStrength
+                            );
+
+                            -- * TODO: spoiler log stat changes
+                        end
+                    end
+                end
+            end
+    
+            RogueEssence.Data.Serializer.SerializeDataAsDiff(monsterfolder .. key ..'.jsonpatch', originalMonsterFolder .. key ..'.json', currentEntry);
+    
+            if Environment.TickCount64 > nextBreak then
+                data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s|2", i, max));
+                coroutine.yield(); nextBreak = Environment.TickCount64+100;
+            end
+    
+            ::skip_pass2::
         end
     end
 
@@ -159,7 +205,8 @@ pokemon_randomizer.Randomize = function ()
                 nameDat = nameRandomizer.GetName({
                     IsSpeciesName = true,
                     Element1 = currentForm.Element1,
-                    Element2 = currentForm.Element2
+                    Element2 = currentForm.Element2,
+                    Species = key
                 }, key);
 
                 if CONST.Methods.IsLocalText(nameDat) then

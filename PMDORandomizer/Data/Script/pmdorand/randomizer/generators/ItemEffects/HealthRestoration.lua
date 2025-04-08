@@ -49,9 +49,9 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
         flatDifference = false,
         maxDifference = 0.2,
         appearanceSettings = {
-            maxRestorePercentage = 0.5,
-            restoreLeaningPercentage = 0.2,
-            restoreLeaningStrength = 0.5
+            maxRestorePercentage        = 0.5,
+            restoreLeaningPercentage    = 0.2,
+            restoreLeaningStrength      = 2.00
         }
     }
 )

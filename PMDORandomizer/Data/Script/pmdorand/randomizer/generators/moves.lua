@@ -76,7 +76,7 @@ moves_randomizer.Randomize = function ()
                             'moves.values',
                             basePowerState.Power - maxOffset, basePowerState.Power + maxOffset,
                             basePowerState.Power,
-                            basePowerOptions.weightedPower.originalPowerWeight
+                            basePowerOptions.weightedPower.originalPowerBias
                         )
                     ,basePowerOptions.maximumPower),basePowerOptions.minimumPower)
                 )

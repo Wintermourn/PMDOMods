@@ -37,6 +37,58 @@ local data = {
 		pokemon = {
 			enabled = true,
 			randomizationChance = 1,
+			baseStats = {
+				enabled = true,
+				randomizationChance = 1,
+				health = {
+					enabled 				= true,
+					randomizationChance 	= 1,
+					minimum 			= 10,
+					maximum 			= 256,
+					maximumDifference 		= 0.50,
+					originalPullStrength 	= 2.00
+				},
+				attack = {
+					enabled 				= true,
+					randomizationChance 	= 1,
+					minimum 			= 10,
+					maximum 			= 256,
+					maximumDifference 		= 0.50,
+					originalPullStrength 	= 2.00
+				},
+				defense = {
+					enabled 				= true,
+					randomizationChance 	= 1,
+					minimum 			= 10,
+					maximum 			= 256,
+					maximumDifference 		= 0.50,
+					originalPullStrength 	= 2.00
+				},
+				spAttack = {
+					enabled 				= true,
+					randomizationChance 	= 1,
+					minimum 			= 10,
+					maximum 			= 256,
+					maximumDifference 		= 0.50,
+					originalPullStrength 	= 2.00
+				},
+				spDefense = {
+					enabled 				= true,
+					randomizationChance 	= 1,
+					minimum 			= 10,
+					maximum 			= 256,
+					maximumDifference 		= 0.50,
+					originalPullStrength 	= 2.00
+				},
+				speed = {
+					enabled 				= true,
+					randomizationChance 	= 1,
+					minimum 			= 10,
+					maximum 			= 256,
+					maximumDifference 		= 0.50,
+					originalPullStrength 	= 2.00
+				}
+			},
 			typing = {
 				enabled = true,
 				randomizationChance = 1,
@@ -125,8 +177,8 @@ local data = {
 				weightedPower = {
 					enabled = true,
 					--- Controls how strongly weighted power pulls towards the center.
-					-- Values between 0 and 1 pull towards the original move's power, while values over 1 will pull away from it.
-					originalPowerWeight = 0.5
+					-- Values below 1 pull away, values over 1 pull towards the original power.
+					originalPowerBias = 2
 				}
 			},
 			-- * not implemented
@@ -164,6 +216,7 @@ local data = {
 				randomizationChance = nil,
 				-- * not implemented
 				includeExistingNames = nil,
+				prioritizeCustomNames = nil,
 				-- * not implemented
 				noDuplicateNames = nil,
 				customNames = {}
@@ -172,6 +225,7 @@ local data = {
 				enabled = true,
 				randomizationChance = 1,
 				includeExistingNames = true,
+				prioritizeCustomNames = true,
 				noDuplicateNames = true,
 				customNames = {
 					unconditional = {
@@ -185,6 +239,14 @@ local data = {
 								"fred"
 							}
 						} ]]
+						{
+							conditions = {
+								Species = "charmander"
+							},
+							names = {
+								"fred"
+							}
+						}
 					}
 				}
 			},
@@ -193,6 +255,7 @@ local data = {
 				enabled = true,
 				randomizationChance = 1,
 				includeExistingNames = false,
+				prioritizeCustomNames = true,
 				noDuplicateNames = true,
 				customNames = {
 					unconditional = {},
@@ -203,6 +266,7 @@ local data = {
 				enabled = false,
 				randomizationChance = 1,
 				includeExistingNames = true,
+				prioritizeCustomNames = true,
 				noDuplicateNames = true,
 				customNames = {
 					unconditional = {},
@@ -314,7 +378,7 @@ data.randomPower = function (generator_index, min, max, center, power)
 		local normalCenter = (center - min)/range;
 		local rng = gen:random();
 
-		local skewed = rng^power;
+		local skewed = rng^(1/power);
 
 		local mapped = skewed < normalCenter and (skewed / normalCenter) or ((skewed - normalCenter)/ (1-normalCenter));
 
@@ -384,6 +448,10 @@ local getConditionalNames = function (conditions, conditionals)
 	return names;
 end
 
+data.getOrDefault = function (priority, fallback)
+	return (priority ~= nil and priority) or fallback;
+end
+
 ---@param existingNames {originalID: string, localization: table}[]
 data.createNamer = function (entries, options, existingNames)
 	local o = {
@@ -395,6 +463,12 @@ data.createNamer = function (entries, options, existingNames)
 		existing = {},
 		--- list of existing ids whose names are already used, for `noDuplicateNames`
 		usedEntries = {}
+	}
+	local localConfig = {
+		enabled = data.getOrDefault(data.options.naming.global.enabled, options.enabled),
+		noDuplicateNames = data.getOrDefault(data.options.naming.global.noDuplicateNames, options.noDuplicateNames),
+		includeExistingNames = data.getOrDefault(data.options.naming.global.includeExistingNames, options.includeExistingNames),
+		prioritizeCustomNames = data.getOrDefault(data.options.naming.global.prioritizeCustomNames, options.prioritizeCustomNames)
 	}
 
 	for _, name in pairs(data.options.naming.global.customNames) do
@@ -421,21 +495,29 @@ data.createNamer = function (entries, options, existingNames)
 		o.conditional[#o.conditional+1] = cond;
 	end
 
-	if options.includeExistingNames then
+	if localConfig.includeExistingNames then
 		for _, entry in pairs(existingNames) do
 			o.existing[#o.existing+1] = entry;
 		end
 	end
 
 	local selection, availableConditionalNames;
-	if options.noDuplicateNames then
+	if localConfig.noDuplicateNames then
 		o.replacedNames = {};
 		local entry;
 		o.GetName = function (conditions, id)
 			availableConditionalNames = getConditionalNames(conditions, o.conditional);
 
 			if #o.any == 0 and #availableConditionalNames == 0 and #o.existing == 0 then return "<no name>" end
-			selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+			if localConfig.prioritizeCustomNames then
+				if #o.any + #availableConditionalNames > 0 then
+					selection = data.random('naming', 1, #o.any + #availableConditionalNames);
+				else
+					selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+				end
+			else
+				selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+			end
 			o.replacedNames[id] = true;
 
 			if selection > #o.any + #availableConditionalNames then
@@ -463,7 +545,15 @@ data.createNamer = function (entries, options, existingNames)
 	else
 		o.GetName = function (conditions)
 			availableConditionalNames = getConditionalNames(conditions, o.conditional);
-			selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+			if localConfig.prioritizeCustomNames then
+				if #o.any + #availableConditionalNames > 0 then
+					selection = data.random('naming', 1, #o.any + #availableConditionalNames);
+				else
+					selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+				end
+			else
+				selection = data.random('naming', 1, #o.any + #availableConditionalNames + #o.existing);
+			end
 
 			if selection > #o.any + #availableConditionalNames then
 				return o.existing[selection - #o.any - #availableConditionalNames];
