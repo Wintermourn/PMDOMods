@@ -6,7 +6,7 @@ Randomize Pokemon stats, moves, evolutions, abilities, as well as items and dung
 **Depends On** [Menu Toolkit Library](../Menu_Toolkit_Library/). Make sure to enable it at the same time!
 ## Progress
 - [ ] Pokemon
-  - [ ] Names
+  - [X] Names
   - [X] Typings
   - [X] Abilities
   - [ ] Evolutions 
@@ -17,7 +17,7 @@ Randomize Pokemon stats, moves, evolutions, abilities, as well as items and dung
     - [ ] Tutor Moves
     - [ ] Egg Moves?
 - [ ] Moves
-  - [ ] Names
+  - [X] Names
   - [X] Typing
   - [ ] Category
   - [X] Power
@@ -26,7 +26,7 @@ Randomize Pokemon stats, moves, evolutions, abilities, as well as items and dung
   - [ ] Pricing
   - [ ] Icons (Menu & Map)
   - [ ] Max Stack
-  - [ ] ... Effects? (chaos)
+  - [X] ... Effects? (chaos)
 - [ ] Abilities
   - [ ] Names
   - [ ] ... Effects? (chaos)

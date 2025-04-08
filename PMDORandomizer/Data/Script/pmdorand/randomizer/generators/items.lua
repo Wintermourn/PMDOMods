@@ -30,6 +30,15 @@ local priceMode = switch{
     end
 }
 
+local itemStates = switch{
+    ["EdibleState"] = function (flags)
+        flags.consumable = true;
+    end,
+    ["EvoState"] = function (flags)
+        flags.evolutional = true;
+    end
+}
+
 local function scanEvent (flags, event, destroyer)
     local eventType = event:GetType();
     if not knownTypesWithBaseEventField then
@@ -71,18 +80,24 @@ local function scanEvent (flags, event, destroyer)
 end
 
 local function testRules(traits, rules)
-    if rules == 0 then return false end
+    if rules == 0 then return true end
     if (rules & ItemEventRule.EXCLUDE_USABLE) > 0 and traits.consumable then return false end
     if (rules & ItemEventRule.EXCLUDE_EQUIPMENT) > 0 and traits.equipable then return false end
-    if (rules & ItemEventRule.BENEFICIAL) > 0 and not traits.beneficial then return false end
-    if (rules & ItemEventRule.HARMFUL) > 0 and not traits.harmful then return false end
+    if (rules & ItemEventRule.EXCLUDE_EVOLUTIONAL) > 0 and traits.evolutional then return false end
+    if (rules & ItemEventRule.REQUIRE_ALL) > 0 then
+        if (rules & ItemEventRule.BENEFICIAL) > 0 and not traits.beneficial then return false end
+        if (rules & ItemEventRule.SITUATIONAL) > 0 and not traits.situational then return false end
+        if (rules & ItemEventRule.HARMFUL) > 0 and not traits.harmful then return false end
+    else
+        if (rules & ItemEventRule.BENEFICIAL) > 0 and traits.beneficial then return true end
+        if (rules & ItemEventRule.SITUATIONAL) > 0 and traits.situational then return true end
+        if (rules & ItemEventRule.HARMFUL) > 0 and traits.harmful then return true end
+        return false;
+    end
     return true;
 end
 
 item_randomizer.Randomize = function ()
-    --- Check if item is consumable
-    -- (PMDC.Dungeon.EdibleState)
-    -- (PMDC.Dungeon.OrbState)
     local max = #ucache.items;
     local maxlen = tostring(max):len();
     local digitTag = '%0'.. maxlen ..'d';
@@ -91,7 +106,9 @@ item_randomizer.Randomize = function ()
     local itemTraits = {
         consumable = false,
         equipable = false,
+        evolutional = false,
         beneficial = false,
+        situational = false,
         harmful = false
     }
     local currentEntry;
@@ -104,28 +121,30 @@ item_randomizer.Randomize = function ()
             priceMode(config.pricing.priceMode);
         end
 
-        if config.effects.enabled then
-            itemTraits.beneficial = false;
-            itemTraits.harmful = false;
-            itemTraits.consumable = false;
+        itemTraits.beneficial = false;
+        itemTraits.harmful = false;
+        itemTraits.consumable = false;
+        itemTraits.equipable = false;
+        itemTraits.evolutional = false;
+        itemTraits.situational = false;
 
-            local itemStateEnumerator = currentEntry.ItemStates:GetEnumerator();
+        local itemStateEnumerator = currentEntry.ItemStates:GetEnumerator();
 
-            while itemStateEnumerator:MoveNext() do
-                local entry = itemStateEnumerator.Current;
-                if entry:GetType().Name == 'EdibleState' then
-                    itemTraits.consumable = true;
-                end
-                if data.external.items.itemEffectTypes[entry:GetType()] then
-                    local rule = data.external.items.itemEffectTypes[entry:GetType()];
-                    if rule & CONST.Enums.ItemEventRule.BENEFICIAL then
-                        itemTraits.beneficial = true;
-                    elseif rule & CONST.Enums.ItemEventRule.HARMFUL then
-                        itemTraits.harmful = true;
-                    end
+        while itemStateEnumerator:MoveNext() do
+            local entry = itemStateEnumerator.Current;
+            -- Fires the itemStates switch, changing traits depending on item states (wowie)
+            itemStates(entry:GetType().Name, itemTraits);
+            if data.external.items.itemEffectTypes[entry:GetType()] then
+                local rule = data.external.items.itemEffectTypes[entry:GetType()];
+                if rule & CONST.Enums.ItemEventRule.BENEFICIAL > 0 then
+                    itemTraits.beneficial = true;
+                elseif rule & CONST.Enums.ItemEventRule.HARMFUL > 0 then
+                    itemTraits.harmful = true;
                 end
             end
+        end
 
+        if config.effects.enabled then
             local dictEnumerator, dictEntry, eventCount;
             for _, evs in pairs({
                 currentEntry.UseEvent.OnHits

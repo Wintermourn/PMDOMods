@@ -16,7 +16,11 @@ local utilitycache = {
     intrinsics = {},
     pokemon = {},
     statuses = {},
-    items = {}
+    items = {},
+    randomized = {
+        pokemon_by_type = {},
+        moves_by_type = {}
+    }
 }
 
 local cached = false;

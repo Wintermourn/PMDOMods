@@ -19,9 +19,10 @@ moves_randomizer.Randomize = function ()
     local powerPointOptions = data.options.moves.powerPoints;
 
     data.spoilers.moves = {};
+    ucache.randomized.moves_by_type = {};
 
     local currentEntry, localSpoiler, basePowerState;
-    local rep, max = 0, #ucache.moves.all;
+    local max = #ucache.moves.all;
     local nextBreak = Environment.TickCount64+100;
     local maxlen = tostring(max):len();
     local digitTag = '%0'.. maxlen ..'d';
@@ -31,10 +32,12 @@ moves_randomizer.Randomize = function ()
     for i, move in pairs(ucache.moves.all) do
         currentEntry = _DATA:GetSkill(move.id);
 
-        moveNames[#moveNames+1] = {
-            originalID = move.id,
-            name = currentEntry.Name
-        };
+        if data.options.naming.enabled and data.options.naming.moves.includeExistingNames then
+            moveNames[#moveNames+1] = {
+                originalID = move.id,
+                name = currentEntry.Name
+            };
+        end
 
         if not data.randomizationChance(data.options.moves.randomizationChance, 'shared') then
             data.spoilers.moves[#data.spoilers.moves+1] = {id = currentEntry.IndexNum, name = currentEntry.Name, skipped = true};
@@ -57,6 +60,8 @@ moves_randomizer.Randomize = function ()
             currentEntry.Data.Element = ucache.elements[data.random('moves.values', 1, #ucache.elements)];
             localSpoiler.Element.to = currentEntry.Data.Element;
         end
+        ucache.randomized.moves_by_type[currentEntry.Data.Element] = ucache.randomized.moves_by_type[currentEntry.Data.Element] or {};
+        ucache.randomized.moves_by_type[currentEntry.Data.Element][#ucache.randomized.moves_by_type[currentEntry.Data.Element]+1] = move.id;
 
         --- Base Power
         if basePowerOptions.enabled and data.randomizationChance(basePowerOptions.randomizationChance, 'moves.values') then

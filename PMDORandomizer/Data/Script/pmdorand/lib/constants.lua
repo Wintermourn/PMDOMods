@@ -30,7 +30,8 @@ local CONST = {
             Linq = {},
             Type = luanet.import_type('System.Type'),
             IO = luanet.namespace('System.IO'),
-            Environment = luanet.import_type('System.Environment')
+            Environment = luanet.import_type('System.Environment'),
+            Dictionary = luanet.import_type('System.Collections.Generic.Dictionary`2')
         },
         Xna = {
             Keys = luanet.import_type('Microsoft.Xna.Framework.Input.Keys')
@@ -58,17 +59,22 @@ local CONST = {
         },
         ---@enum PMDOR.ItemEventRule
         ItemEventRule = {
-            DENIED              = 0,
+            DENIED              = 0x00,
+            REQUIRE_ALL         = 0x01,
             --- The item has known positive effects.
-            BENEFICIAL          = 1,
+            BENEFICIAL          = 0x02,
             --- The item has recovery effects (HP, PP, Belly, ...)
-            HEALING             = 2,
+            HEALING             = 0x04,
+            --- The item's usefulness can depend on the environment or what it does.
+            SITUATIONAL         = 0x08,
             --- The item has known negative effects.
-            HARMFUL             = 4,
+            HARMFUL             = 0x10,
             --- Denies items that can be used/consumed (e.g. berries)
-            EXCLUDE_USABLE      = 8,
+            EXCLUDE_USABLE      = 0x20,
             --- Denies items that are equipped/held (e.g. Mobile Scarf)
-            EXCLUDE_EQUIPMENT   = 16
+            EXCLUDE_EQUIPMENT   = 0x40,
+            --- Denies items that have the EvoState on them (e.g. evo stones)
+            EXCLUDE_EVOLUTIONAL = 0x80
         },
         EventType = {
             INSTANT     = 1
@@ -123,12 +129,21 @@ end
 
 local type_String = System.Type.GetType("System.String");
 System.Regex = System.Type.GetType("System.Text.RegularExpressions.Regex, System.Text.RegularExpressions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
+local __Regex_Replace = System.Regex:GetMethod(
+    "Replace",
+    CONST.Enums.BindingFlags.Convert(CONST.Enums.BindingFlags.Public | CONST.Enums.BindingFlags.Static),
+    luanet.make_array(System.Type, {type_String, type_String, type_String})
+);
+local __Regex_Match = System.Regex:GetMethod(
+    "Match",
+    CONST.Enums.BindingFlags.Convert(CONST.Enums.BindingFlags.Public | CONST.Enums.BindingFlags.Static),
+    luanet.make_array(System.Type, {type_String, type_String})
+);
 CONST.Methods.System.Regex.Replace = function (string, pattern, replacement)
-    return System.Regex:GetMethod(
-        "Replace",
-        CONST.Enums.BindingFlags.Convert(CONST.Enums.BindingFlags.Public | CONST.Enums.BindingFlags.Static),
-        luanet.make_array(System.Type, {type_String, type_String, type_String})
-    ):Invoke(nil, luanet.make_array(System.String, {string, pattern, replacement}));
+    return __Regex_Replace:Invoke(nil, luanet.make_array(System.String, {string, pattern, replacement}));
+end
+CONST.Methods.System.Regex.Match = function (string, pattern)
+    return __Regex_Match:Invoke(nil, luanet.make_array(System.String, {string, pattern}));
 end
 
 local type_LocalText = luanet.ctype(RogueEssence.LocalText);
@@ -137,6 +152,14 @@ CONST.Methods.IsLocalText = function (object)
         return type_LocalText:IsAssignableFrom(object:GetType());
     end
     return false;
+end
+
+CONST.Methods.ivalues = function (tbl)
+    local i = 0;
+    return function ()
+        i = i + 1;
+        return tbl[i];
+    end
 end
 
 return CONST;

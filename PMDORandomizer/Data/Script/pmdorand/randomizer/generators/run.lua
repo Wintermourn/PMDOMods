@@ -1,7 +1,9 @@
 local data = require 'pmdorand.randomizer.data'
 local CONST = require 'pmdorand.lib.constants'
     local __Directory = CONST.Classes.System.IO.Directory;
+    local __Type = CONST.Classes.System.Type;
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
+local DataType = RogueEssence.Data.DataManager.DataType;
 
 local function DisplayString(var)
     return var ~= '' and '`'.. var ..'`' or '<none>'
@@ -12,6 +14,62 @@ local function LogChangeMessage(message, first, second, firstName, secondName)
         data.spoilerLog:write(string.format("%s: %s -> %s\n", message, firstName or first, secondName or second));
     else
         data.spoilerLog:write(string.format("%s: %s (UNCHANGED)\n", message, firstName or first));
+    end
+end
+
+local __DataManager_LoadModData = luanet.ctype(RogueEssence.Data.DataManager):GetMethod("LoadModData"):MakeGenericMethod(
+    luanet.make_array(CONST.Classes.System.Type, {__Type.GetType 'RogueEssence.Data.IEntryData, RogueEssence'})
+);
+local indexArgs = luanet.make_array(CONST.Classes.System.Object, {
+    data.mod.header, '', '', RogueEssence.Data.DataManager.DATA_EXT
+});
+
+--- Aggressively strangling pmdo to give me my index files.
+local function CreateIndex(type)
+    local stream = CONST.Classes.System.IO.FileStream(
+        data.mod.path ..'/Data/'.. type:ToString() ..'/index.idx',
+        CONST.Classes.System.IO.FileMode.Create,
+        CONST.Classes.System.IO.FileAccess.Write,
+        CONST.Classes.System.IO.FileShare.None
+    );
+
+    --local index = _DATA.DataIndices[type]:GetModIndex(data.mod.header.UUID);
+    local entries = LUA_ENGINE:MakeGenericType(
+        CONST.Classes.System.Dictionary,
+        {
+            CONST.Classes.System.String,
+            RogueEssence.Data.EntrySummary
+        },
+        {}
+    );
+
+    local files = __Directory.GetFiles(data.mod.path ..'/Data/'.. type:ToString(), '*');
+    local dir, filename, testext, dat;
+
+    indexArgs[1] = 'Data/'.. type:ToString() ..'/';
+    for i = 0, files.Length - 1 do
+        dir = files[i];
+        filename = CONST.Classes.System.IO.Path.GetFileNameWithoutExtension(dir);
+        testext = CONST.Classes.System.IO.Path.GetExtension(dir);
+
+        if testext == RogueEssence.Data.DataManager.DATA_EXT or testext == RogueEssence.Data.DataManager.PATCH_EXT then
+            indexArgs[2] = filename;
+            logger:debug(tostring(indexArgs[0]),tostring(indexArgs[1]),tostring(indexArgs[2]),tostring(indexArgs[3]))
+            dat = __DataManager_LoadModData:Invoke(nil, indexArgs);
+            if dat then
+                logger:debug("data exists, a summary can happen");
+                entries[filename] = dat:GenerateEntrySummary();
+            end
+        end
+    end
+
+    if entries.Count > 0 then
+        RogueEssence.Data.Serializer.SerializeData(stream, entries);
+        stream:Flush();
+        stream:Close();
+    else
+        stream:Close();
+        CONST.Classes.System.IO.File.Delete(data.mod.path ..'/Data/'.. type:ToString() ..'/index.idx');
     end
 end
 
@@ -85,6 +143,16 @@ return function(randomLabel, menu)
         require 'pmdorand.randomizer.generators.items' .Randomize();
         data.FireEvent('randomizing:items/post');
     end
+
+    logger:debug("index");
+    randomLabel:SetLabel('right', "[color=#aaaaaa][ Indexing ]");
+    CreateIndex(DataType.Item);
+    CreateIndex(DataType.Skill);
+    CreateIndex(DataType.Monster);
+    --[[ local modFolder = CONST.Methods.System.Regex.Match(data.mod.path, ".*\\/(MODS\\/.*)");
+    if modFolder.Success then
+        Dev.DevHelper.IndexNamedData(modFolder.Groups[1].Captures[0].Value .. '/Data/Skill/');
+    end ]]
 
     if data.options.generateSpoilerLog then
         logger:debug("spoiler log output");

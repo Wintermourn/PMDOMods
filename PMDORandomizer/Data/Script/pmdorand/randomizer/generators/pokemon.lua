@@ -11,6 +11,7 @@ pokemon_randomizer.Randomize = function ()
     local originalMonsterFolder = RogueEssence.Data.DataManager.DATA_PATH ..'/Monster/'
 
     data.spoilers.pokemon = {};
+    ucache.randomized.pokemon_by_type = {};
 
     local currentEntry, currentForm, form, move, localSpoiler;
     
@@ -20,14 +21,15 @@ pokemon_randomizer.Randomize = function ()
     local nextBreak = Environment.TickCount64+100;
 
     local options = data.options.pokemon;
-    local movesOptions = data.options.pokemon.moves;
-    local guaranteedAttackStartingMoves = math.min(movesOptions.guaranteedStartingMoves, movesOptions.ensuredAttackingMoves);
-    local guaranteedAnyStartingMoves = movesOptions.guaranteedStartingMoves - guaranteedAttackStartingMoves;
+
+    local elementByType1, elementByType2;
 
     local pokemonNames = {};
 
     local typeList = data.typeBlacklist(ucache.elements, data.options.pokemon.typing.bannedTypes);
 
+    local sub_moveset = require 'pmdorand.randomizer.generators.sub.pokemon.moveset';
+    sub_moveset.InitializeVariables();
     for i, key in pairs(ucache.pokemon) do
         currentEntry = _DATA:GetMonster(key);
 
@@ -58,7 +60,7 @@ pokemon_randomizer.Randomize = function ()
             };
             localSpoiler.forms[f+1] = form;
 
-            if data.options.naming.pokemon.includeExistingNames then
+            if data.options.naming.enabled and data.options.naming.pokemon.includeExistingNames then
                 pokemonNames[#pokemonNames+1] = {
                     originalID = key,
                     formID = f,
@@ -76,6 +78,9 @@ pokemon_randomizer.Randomize = function ()
                     currentForm.Element1 = typeList[firstTypeId];
                     form.Element1.to = currentForm.Element1;
                 end
+                ucache.randomized.pokemon_by_type[currentForm.Element1] = ucache.randomized.pokemon_by_type[currentForm.Element1] or {};
+                elementByType1 = ucache.randomized.pokemon_by_type[currentForm.Element1];
+                elementByType1[#elementByType1+1] = {pokemon = key, form = f};
 
                 if options.typing.typeRetainment ~= 2 then
                     if options.typing.typeRetainment ~= 1 and not data.options.pokemon.typing.allowDuplicateTyping then
@@ -102,26 +107,17 @@ pokemon_randomizer.Randomize = function ()
                         table.insert(typeList, firstTypeId, currentForm.Element1);
                     end
                 end
+
+                if form.Element2 ~= 'none' then
+                    ucache.randomized.pokemon_by_type[currentForm.Element2] = ucache.randomized.pokemon_by_type[currentForm.Element2] or {};
+                    elementByType2 = ucache.randomized.pokemon_by_type[currentForm.Element2];
+                    elementByType2[#elementByType2+1] = {pokemon = key, form = f};
+                end
             end
 
             --- Movesets
             if data.options.pokemon.moves.enabled and data.randomizationChance(options.moves.randomizationChance, 'pokemon.moves') then
-                form.LevelSkills = {};
-                currentForm.LevelSkills:Clear();
-                if guaranteedAnyStartingMoves > 0 then
-                    for _ = 1, guaranteedAnyStartingMoves do
-                        move = ucache.moves.all[data.random('pokemon.moves',1,#ucache.moves.all)];
-                        form.LevelSkills[#form.LevelSkills+1] = {level = 1, move = move};
-                        currentForm.LevelSkills:Add(RogueEssence.Data.LevelUpSkill(move.id, 1));
-                    end
-                end
-                if guaranteedAttackStartingMoves > 0 then
-                    for _ = 1, guaranteedAttackStartingMoves do
-                        move = ucache.moves.attacking[data.random('pokemon.moves',1,#ucache.moves.attacking)];
-                        form.LevelSkills[#form.LevelSkills+1] = {level = 1, move = move};
-                        currentForm.LevelSkills:Add(RogueEssence.Data.LevelUpSkill(move.id, 1));
-                    end
-                end
+                sub_moveset.Randomize(currentForm, form);
             end
 
             --- Intrinsics
@@ -144,6 +140,11 @@ pokemon_randomizer.Randomize = function ()
             data.updateRoutineUtils.menuOption:SetLabel('right', string.format("[color=#aaaaaa]P".. digitTag .."/%s", i, max));
             coroutine.yield(); nextBreak = Environment.TickCount64+100;
         end
+    end
+
+    if options.evolutions.enabled then
+        data.updateRoutineUtils.menuOption:SetLabel('right', "[color=#aaaaaa]EP[...]");
+        require 'pmdorand.randomizer.generators.EvolutionMethods' .Randomize();
     end
 
     if data.options.naming.enabled and data.options.naming.pokemon.enabled then

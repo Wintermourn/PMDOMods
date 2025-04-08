@@ -55,20 +55,21 @@ local data = {
 			},
 			moves = {
 				enabled = true,
-				randomizationChance = 1,
+				randomizationChance 	= 1.00,
 				--- How many moves should a Pokemon start with (at level 1)?
 				guaranteedStartingMoves = 4,
 				--- How many of the starting moves should be attacks (physical/special)?
-				ensuredAttackingMoves = 2,
+				ensuredAttackingMoves 	= 2,
+				maximumMoves			= 50,
 				-- * not implemented
 				learnset = {
-					shuffleExisting = false,
+					shuffleExisting 	= false,
 				},
 				-- * not implemented
-				typeMismatch = {
-					allowed = true,
-					rate =  0.20,
-					limit = 0.90
+				typeMatching = {
+					allowed 			= false,
+					targetRate			= 0.20,
+					mismatchLimit		= 0.90
 				}
 			},
 			intrinsics = {
@@ -79,6 +80,22 @@ local data = {
 				slotFillChance  = 0.50,
 				-- * not implemented
 				slotFillLimit   = 3
+			},
+			evolutions = {
+				enabled = true,
+				shuffleExistingEvolutions = false,
+				allowEvolutionReuse = false,
+				maxEvolutionsPerPokemon = 1,
+				sameTypeEvolutions = false,
+				statImprovingEvolutions = false,
+				evolutionWeights = {
+					level = 100,
+					itemBased = 10,
+					evolvedFriends = 40,
+					timeBased = 1,
+					weatherBased = 1
+				},
+				blacklistedPokemon = {}
 			}
 		},
 		moves = {
@@ -183,7 +200,7 @@ local data = {
 				}
 			},
 			moves = {
-				enabled = true,
+				enabled = false,
 				randomizationChance = 1,
 				includeExistingNames = true,
 				noDuplicateNames = true,
@@ -224,6 +241,9 @@ local data = {
 		items = {
 			itemEffects = {},
 			itemEffectTypes = {}
+		},
+		pokemon = {
+			evolutionMethods = {}
 		}
 	}
 };
@@ -504,6 +524,7 @@ data.FireEvent = function (event, ...)
 end
 
 local type_BattleEvent = luanet.ctype(RogueEssence.Dungeon.BattleEvent);
+local type_PromoteDetail = luanet.ctype(RogueEssence.Data.PromoteDetail);
 local type_Type = luanet.ctype(CONST.Classes.System.Type);
 
 ---@generic options
@@ -555,7 +576,20 @@ data.SetEffectType = function (effectClass, rule)
 	elseif luanet.ctype(effectClass) and luanet.ctype(effectClass):IsSubclassOf(type_BattleEvent) then
 		data.external.items.itemEffectTypes[luanet.ctype(effectClass)] = rule;
 	else
-		logger:err(("SetEffectType parameter effectClass (value %s) does not extend C# abstract class BattleEvent"):format(tostring(effectClass)));
+		logger:err(("SetEffectType parameter effectClass (value `%s`) does not extend C# abstract class BattleEvent"):format(tostring(effectClass)));
+	end
+end
+
+data.AddEvolutionMethod = function (evoClass, onEvoRandomized, settings)
+	if LUA_ENGINE:TypeOf(evoClass) == type_Type and not evoClass:IsSubclassOf(type_PromoteDetail) then
+		logger:err(("AddEvolutionMethod parameter evoClass (value `%s`) does not extend C# abstract class PromoteDetail"):format(tostring(evoClass)));
+	elseif luanet.ctype(evoClass) then
+		if luanet.ctype(evoClass):IsSubclassOf(type_PromoteDetail) then
+			evoClass = luanet.ctype(evoClass);
+		else
+			logger:err(("AddEvolutionMethod parameter evoClass (value `%s`) does not extend C# abstract class PromoteDetail"):format(tostring(evoClass)));
+		end
+		--data.external.items.itemEffectTypes[luanet.ctype(evoClass)] = rule;
 	end
 end
 

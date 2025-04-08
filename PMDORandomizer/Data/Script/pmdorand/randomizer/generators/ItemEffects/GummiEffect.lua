@@ -1,5 +1,3 @@
-local CONST = require 'pmdorand.lib.constants'
-
 require 'pmdorand.randomizer.data' .AddItemEffect(
     "GummiEffect",
     {
@@ -14,5 +12,3 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
         fullEffectRate = 0.0
     }
 )
-
-require 'pmdorand.randomizer.data' .SetEffectType(PMDC.Dungeon.VitaGummiEvent, CONST.Enums.ItemEventRule.BENEFICIAL);

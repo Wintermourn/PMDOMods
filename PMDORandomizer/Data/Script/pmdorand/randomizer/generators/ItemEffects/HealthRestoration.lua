@@ -1,5 +1,3 @@
-local CONST = require 'pmdorand.lib.constants'
-    local ItemEventRule = CONST.Enums.ItemEventRule;
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
 require 'pmdorand.randomizer.data' .AddItemEffect(
@@ -14,7 +12,6 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
         -- This is only true once per item
         if target.isItem then
             if not data.randomizationChance(config.appearanceChance, 'items') then return end
-            logger:debug("This would generate a new RestoreHPEvent!")
             target.object.UseEvent.OnHits:Add(1, PMDC.Dungeon.RestoreHPEvent(
                 data.randomPower(
                     'items',
@@ -58,5 +55,3 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
         }
     }
 )
-
-require 'pmdorand.randomizer.data' .SetEffectType(PMDC.Dungeon.RestoreHPEvent, ItemEventRule.BENEFICIAL | ItemEventRule.HEALING);
