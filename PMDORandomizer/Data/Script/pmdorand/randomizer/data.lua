@@ -230,6 +230,7 @@ local data = {
 				customNames = {
 					unconditional = {
 					},
+					---@type PMDOR.Naming.Pokemon[]
 					conditional = {
 						--[[ {
 							conditions = {
@@ -239,14 +240,14 @@ local data = {
 								"fred"
 							}
 						} ]]
-						{
+						--[[ {
 							conditions = {
 								Species = "charmander"
 							},
 							names = {
 								"fred"
 							}
-						}
+						} ]]
 					}
 				}
 			},
@@ -270,6 +271,7 @@ local data = {
 				noDuplicateNames = true,
 				customNames = {
 					unconditional = {},
+					---@type PMDOR.Naming.Moves[]
 					conditional = {}
 				}
 			},
