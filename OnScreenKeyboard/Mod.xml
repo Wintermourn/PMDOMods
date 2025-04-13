@@ -1,0 +1,11 @@
+<Header>
+  <Name>On-Screen Keyboard</Name>
+  <Author>Wintermourn</Author>
+  <Description>Shows a keyboard on screen whenever text can be input.</Description>
+  <Namespace>screenkeyboard</Namespace>
+  <UUID>944216E9-F790-48C2-BA4F-62626832DAD6</UUID>
+  <Version>0.1</Version>
+  <GameVersion>0.0</GameVersion>
+  <ModType>Mod</ModType>
+  <Relationships />
+</Header>
