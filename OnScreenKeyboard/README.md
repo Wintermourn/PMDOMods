@@ -20,3 +20,4 @@ Currently has some additional inputs for controllers:
     - [ ] Start = Move to end
     - [ ] Select = Switch keyboard
     - [ ] Circle/B = Cancel
+- [ ] Mouse input
