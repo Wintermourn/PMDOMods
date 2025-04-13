@@ -6,6 +6,7 @@ Currently has some additional inputs for controllers:
 - Left/Right Trigger jumps left/right 5 characters on the keyboard
 - Left Face (Square/X) deletes the last character
 - Top Face (Triangle/Y) adds a space
+- Select or Right Stick Up/Down switches keyboards
 
 ## Todo
 - [ ] Support ScriptableMenu (+ implement some way to validate character inputs)
@@ -18,6 +19,6 @@ Currently has some additional inputs for controllers:
 - [ ] Support PMD's keyboard inputs
     - [ ] RB+DPad = Shift entry spot
     - [ ] Start = Move to end
-    - [ ] Select = Switch keyboard
+    - [X] Select = Switch keyboard
     - [ ] Circle/B = Cancel
 - [ ] Mouse input

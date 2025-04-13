@@ -12,6 +12,7 @@ local array_NonPublic_Instance = LUA_ENGINE:LuaCast(36, CONST.Classes.System.Bin
 local array_Object_Empty = luanet.make_array(__Object, {});
 local __TextInputMenu_UpdatePickerPos = type_TextInputMenu:GetMethod("UpdatePickerPos", array_NonPublic_Instance);
 local __TextInputMenu_ProcessTextInput = type_TextInputMenu:GetMethod("ProcessTextInput", array_NonPublic_Instance);
+local __InputManager_CurrentInput = luanet.ctype(RogueEssence.InputManager):GetField("CurrentInput", array_NonPublic_Instance);
 
 local KEYBOARD_LABEL = "MTK_KEYBOARD";
 local defaultKeyboard = require 'screenkeyboard' .keyboards.alphanumeric;
@@ -294,6 +295,33 @@ local inputSwitch = switch {
     end,
 
     ---@param stackEntry screenkeyboard.KeyboardStackEntry
+    ['RStickUp'] = function (stackEntry)
+        if stackEntry.customKeyboards[1] then
+            stackEntry.__keyboardScroll = (stackEntry.__keyboardScroll - 1)%#stackEntry.customKeyboards;
+            setKeyboardDisplay(stackEntry, stackEntry.customKeyboards[stackEntry.__keyboardScroll + 1]);
+        else
+            if stackEntry.currentKeyboard == require 'screenkeyboard' .keyboards.alphanumeric then
+                stackEntry.currentKeyboard = require 'screenkeyboard' .keyboards.symbols;
+            else
+                stackEntry.currentKeyboard = require 'screenkeyboard' .keyboards.alphanumeric;
+            end
+        end
+    end,
+    ---@param stackEntry screenkeyboard.KeyboardStackEntry
+    ['RStickDown'] = function (stackEntry)
+        if stackEntry.customKeyboards[1] then
+            stackEntry.__keyboardScroll = (stackEntry.__keyboardScroll + 1)%#stackEntry.customKeyboards;
+            setKeyboardDisplay(stackEntry, stackEntry.customKeyboards[stackEntry.__keyboardScroll + 1]);
+        else
+            if stackEntry.currentKeyboard == require 'screenkeyboard' .keyboards.alphanumeric then
+                stackEntry.currentKeyboard = require 'screenkeyboard' .keyboards.symbols;
+            else
+                stackEntry.currentKeyboard = require 'screenkeyboard' .keyboards.alphanumeric;
+            end
+        end
+    end,
+
+    ---@param stackEntry screenkeyboard.KeyboardStackEntry
     [RogueEssence.FrameInput.InputType.Confirm] = function (stackEntry, input)
         if stackEntry.coordinates.x > -1 then
             keyboardKey = stackEntry.currentKeyboard.grid[stackEntry.coordinates.y][stackEntry.coordinates.x];
@@ -324,6 +352,7 @@ local inputSwitch = switch {
 }
 
 local topOfStack;
+local currentInput, gamepad, rstickDirection, previousRSDirection;
 local keyboard_input = function (i)
     topOfStack = keyboardStack[#keyboardStack];
 
@@ -338,22 +367,60 @@ local keyboard_input = function (i)
         return;
     end
 
-    if i:BaseButtonPressed(CONST.Enums.Buttons.LeftTrigger) then
-        inputSwitch(CONST.Enums.Buttons.LeftTrigger, topOfStack, i);
-        return;
-    elseif i:BaseButtonPressed(CONST.Enums.Buttons.RightTrigger) then
-        inputSwitch(CONST.Enums.Buttons.RightTrigger, topOfStack, i);
-        return;
+    if i:AnyButtonPressed() then
+        if i:BaseButtonPressed(CONST.Enums.Buttons.LeftTrigger) then
+            inputSwitch(CONST.Enums.Buttons.LeftTrigger, topOfStack, i);
+            return;
+        elseif i:BaseButtonPressed(CONST.Enums.Buttons.RightTrigger) then
+            inputSwitch(CONST.Enums.Buttons.RightTrigger, topOfStack, i);
+            return;
+        end
+    
+        if i:BaseButtonPressed(CONST.Enums.Buttons.Select) then
+            inputSwitch('RStickDown', topOfStack, i);
+            return;
+        end
+        if i:BaseButtonPressed(CONST.Enums.Buttons.FaceTop) then
+            inputSwitch(CONST.Enums.Keys.Space, topOfStack, i);
+            return;
+        end
+        if i:BaseButtonPressed(CONST.Enums.Buttons.FaceLeft) then
+            inputSwitch(CONST.Enums.Keys.Backspace, topOfStack, i);
+            return;
+        end
+    else
+        if i:BaseKeyPressed(CONST.Enums.Keys.Space) then
+            inputSwitch(CONST.Enums.Keys.Space, topOfStack, i);
+            return;
+        end
+        if i:BaseKeyPressed(CONST.Enums.Keys.Backspace) then
+            inputSwitch(CONST.Enums.Keys.Backspace, topOfStack, i);
+            return;
+        end
     end
 
-    if i:BaseKeyPressed(CONST.Enums.Keys.Space) or i:BaseButtonPressed(CONST.Enums.Buttons.FaceTop) then
-        inputSwitch(CONST.Enums.Keys.Space, topOfStack, i);
-        return;
-    end
+    currentInput = __InputManager_CurrentInput:GetValue(i);
+    if currentInput.BaseGamepadState then
+        gamepad = currentInput.BaseGamepadState;
+        if gamepad.ThumbSticks.Right:Length() > 0.25 then
+            previousRSDirection = rstickDirection;
+            rstickDirection = RogueElements.DirExt.ApproximateDir8(
+                RogueElements.Loc(gamepad.ThumbSticks.Right.X * 100, -gamepad.ThumbSticks.Right.Y * 100)
+            );
 
-    if i:BaseKeyPressed(CONST.Enums.Keys.Backspace) or i:BaseButtonPressed(CONST.Enums.Buttons.FaceLeft) then
-        inputSwitch(CONST.Enums.Keys.Backspace, topOfStack, i);
-        return;
+            if previousRSDirection ~= rstickDirection then
+                if rstickDirection == Dir8.UP then
+                    inputSwitch('RStickUp', topOfStack, i);
+                    return;
+                elseif rstickDirection == Dir8.DOWN then
+                    inputSwitch('RStickDown', topOfStack, i);
+                    return;
+                end
+            end
+        else
+            previousRSDirection = rstickDirection;
+            rstickDirection = Dir8.NONE;
+        end
     end
 
     if i.Direction == i.PrevDirection then
@@ -385,7 +452,6 @@ end
 
 keyboard.__menu = RogueEssence.Menu.ScriptableMenu(KEYBOARD_LABEL, 0,132,320,100, keyboard_input);
 keyboard.cursor = RogueEssence.Menu.MenuCursor(keyboard.__menu);
-keyboard.__menu.Elements:Add(keyboard.cursor);
 
 for y = 0, 5 do
     keyboard.rows[y] = {};
@@ -400,6 +466,7 @@ for s, k in ipairs(keyboard.sidebar) do
     k.object = CONST.Functions.Menu.CreateText(tag.parse(k.label), 16, (s-1) * 14 + 10);
     keyboard.__menu.Elements:Add(k.object);
 end
+keyboard.__menu.Elements:Add(keyboard.cursor);
 
 return {
     DetectKeyboardable = detectForKeyboard,

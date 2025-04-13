@@ -34,7 +34,9 @@ local CONST = {
             LeftTrigger = input.Buttons.LeftTrigger,
             RightTrigger = input.Buttons.RightTrigger,
             FaceLeft = input.Buttons.X,
-            FaceTop = input.Buttons.Y
+            FaceTop = input.Buttons.Y,
+            Select = input.Buttons.Back,
+            Start = input.Buttons.Start
         }
     },
     Classes = {
