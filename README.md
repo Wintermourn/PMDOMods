@@ -11,3 +11,5 @@ Comments in code are made assuming the use of vscode's [Lua Language Server](htt
 ### Content
 - #### [PMDO Randomizer (`pmdorand`)](PMDORandomizer/)
   A work in progress randomizer for PMDO with options available on the top menu. Randomize Pokemon types, moves, and more.
+- #### [On-Screen Keyboard (`screenkeyboard`)](OnScreenKeyboard/)
+  Keyboard that automatically opens for text input for controller support.
