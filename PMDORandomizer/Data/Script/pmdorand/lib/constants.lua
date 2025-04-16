@@ -76,6 +76,11 @@ local CONST = {
             --- Denies items that have the EvoState on them (e.g. evo stones)
             EXCLUDE_EVOLUTIONAL = 0x80
         },
+        --- Priority used for sorting internal effects in the player-viewed list.
+        ItemEffectPriority = {
+            RECOVERY = -128,
+            INEVITABLE_DOOM = 64
+        },
         EventType = {
             INSTANT     = 1
         },

@@ -236,6 +236,12 @@
   <data name="pmdorand:effect/item/PerishSong.description" xml:space="preserve">
     <value>Be wary! Some items might have a run-ending effect if used too often...</value>
   </data>
+  <data name="pmdorand:effect/item/HeartAttackMachine" xml:space="preserve">
+    <value>Heart Attack Machine</value>
+  </data>
+  <data name="pmdorand:effect/item/HeartAttackMachine.description" xml:space="preserve">
+    <value>A single use of this item will mean the end of your life...</value>
+  </data>
 
   <data name="pmdorand:config/effect/item/HealthRestoration/flatDifference.title" xml:space="preserve">
     <value>[color=#aaaaaa]Modify[color] &gt; Flat Difference</value>

@@ -1,6 +1,6 @@
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
-local effect = require 'pmdorand.randomizer.data' .AddItemEffect(
+require 'pmdorand.randomizer.data' .AddItemEffect(
     --- Effect Data name (this is stored in the save file)
     "HealthRestoration",
     --- Related Events - the function below is fired whenever one of these events is found inside of an item
@@ -96,5 +96,4 @@ local effect = require 'pmdorand.randomizer.data' .AddItemEffect(
             }
         }
     }
-)
-effect.sortPriority = -128;
+).sortPriority = require 'pmdorand.lib.constants' .Enums.ItemEffectPriority.RECOVERY;

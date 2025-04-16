@@ -21,5 +21,6 @@ return {
         require 'pmdorand.randomizer.generators.ItemEffects.PPRestoration'
         require 'pmdorand.randomizer.generators.ItemEffects.GummiEffect'
         require 'pmdorand.randomizer.generators.ItemEffects.PerishSong'
+        require 'pmdorand.randomizer.generators.ItemEffects.HeartAttackMachine'
     end
 }

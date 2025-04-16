@@ -62,7 +62,7 @@ local function scanEvent (flags, event, destroyer)
         scanEvent(flags, event.BaseEvent, destroyer);
     else
         for i, k in pairs(data.external.items.itemEffects) do
-            if k.types[eventType] then
+            if k.types[eventType] and data.options.items.effects[i].enabled then
                 k.onItemRandomized(
                     ---@type PMDOR.ItemEvent.Target
                     {
@@ -165,18 +165,20 @@ item_randomizer.Randomize = function ()
 
         local appearanceRule;
         for id, k in pairs(data.external.items.itemEffects) do
-            appearanceRule = data.options.items.effects[id].appearanceRules;
-            if testRules(itemTraits, appearanceRule) then
-                k.onItemRandomized(
-                    ---@type PMDOR.ItemEvent.Target
-                    {
-                        isItem = true,
-                        isEvent = false,
-                        object = currentEntry
-                    },
-                    data.options.items.effects[id],
-                    data
-                );
+            if data.options.items.effects[id].enabled then
+                appearanceRule = data.options.items.effects[id].appearanceRules;
+                if testRules(itemTraits, appearanceRule) then
+                    k.onItemRandomized(
+                        ---@type PMDOR.ItemEvent.Target
+                        {
+                            isItem = true,
+                            isEvent = false,
+                            object = currentEntry
+                        },
+                        data.options.items.effects[id],
+                        data
+                    );
+                end
             end
         end
 

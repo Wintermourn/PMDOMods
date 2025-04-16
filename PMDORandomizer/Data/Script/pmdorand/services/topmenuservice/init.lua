@@ -55,7 +55,7 @@ TMS.Subscribe = function(_, med)
         if data.updateCoroutine ~= nil then
             local output, error = coroutine.resume(data.updateCoroutine);
             if not output and error then
-                logger:err(error);
+                logger:err(type(error) == 'userdata' and error:ToString() or error);
             end
             if coroutine.status(data.updateCoroutine) == 'dead' then data.updateCoroutine = nil end
         end
