@@ -10,7 +10,7 @@ local CHANGELOG = {
 
 return function()
     if changelog_menu == nil then
-        changelog_menu = textile_menu(32,96,256,127);
+        changelog_menu = textile_menu.create(32,96,256,127);
         changelog_menu.title = "Changelog"
 
         for _,k in pairs(CHANGELOG) do

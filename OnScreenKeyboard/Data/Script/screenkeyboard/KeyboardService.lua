@@ -57,8 +57,13 @@ OSKS.Subscribe = function(_, med)
                 });
                 table.remove(waitingForMenus, 1);
             elseif __Environment.TickCount64 - waitingForMenus[1].requestAt > 4000 then
+                logger:warn("menu wait expired")
                 table.remove(waitingForMenus, 1);
             end
+        else
+            menuList = __MenuManager_menus:GetValue(_MENU);
+            if menuList.Count == 0 then return end
+            keyboard.QueryClosure(menuList[menuList.Count - 1]);
         end
     end);
 end

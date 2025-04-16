@@ -101,6 +101,12 @@
     <value>View Saved Options</value>
     <comment>Label of the Save menu option.</comment>  
   </data>
+  <data name="pmdorand:title/items" xml:space="preserve">
+    <value>Items</value>
+  </data>
+  <data name="pmdorand:subtitle/itemeffects" xml:space="preserve">
+    <value>Item Effects</value>
+  </data>
   <data name="pmdorand:seed.clear" xml:space="preserve">
     <value>[color=#777777]Press `DELETE` to clear the selected seed.</value>
     <comment></comment>  
@@ -116,6 +122,12 @@
   </data>
   <data name="pmdorand:option.disabled" xml:space="preserve">
     <value>[color=#ff9090]Disabled</value>
+  </data>
+  <data name="pmdorand:option.enabled.fade" xml:space="preserve">
+    <value>[color=#5080aa]Enabled</value>
+  </data>
+  <data name="pmdorand:option.disabled.fade" xml:space="preserve">
+    <value>[color=#aa5050]Disabled</value>
   </data>
   <data name="pmdorand:top.clear" xml:space="preserve">
     <value>This will clear every modified file from the randomizer, returning everything to normal.[br]Your current save will likely not play correctly after this.[pause=0] Continue?</value>
@@ -173,6 +185,65 @@
   <data name="pmdorand:save.name.title" xml:space="preserve">
     <value>Choose a name.</value>
   </data>
+  <data name="mentoolkit:description/randomize/itemeffect.title" xml:space="preserve">
+    <value>Randomize</value>
+  </data>
+  <data name="mentoolkit:description/randomize/itemeffect.description" xml:space="preserve">
+    <value>Allows the effect to appear on or modify items.</value>
+  </data>
+  <data name="mentoolkit:description/itemeffect/appearance.title" xml:space="preserve">
+    <value>Appearance Settings</value>
+  </data>
+  <data name="mentoolkit:description/itemeffect/appearance.description" xml:space="preserve">
+    <value>Submenu for settings that control how often and on what items an effect can appear on.</value>
+  </data>
+  <data name="mentoolkit:description/itemeffect/modify.title" xml:space="preserve">
+    <value>Modify Chance</value>
+  </data>
+  <data name="mentoolkit:description/itemeffect/modify.description" xml:space="preserve">
+    <value>Controls the rate that this effect can change items that it might already appear on.</value>
+  </data>
+  <data name="mentoolkit:description/itemeffect/disappear.title" xml:space="preserve">
+    <value>Disappearance Chance</value>
+  </data>
+  <data name="mentoolkit:description/itemeffect/disappear.description" xml:space="preserve">
+    <value>Determines how often an effect can disappear from items that it might normally be on.</value>
+  </data>
+  <data name="pmdorand:effect/item/HealthRestoration" xml:space="preserve">
+    <value>Health Restoration</value>
+  </data>
+  <data name="pmdorand:effect/item/PPRestoration" xml:space="preserve">
+    <value>PP Restoration</value>
+  </data>
+  <data name="pmdorand:effect/item/BellyRestoration" xml:space="preserve">
+    <value>Belly Restoration</value>
+  </data>
+  <data name="pmdorand:effect/item/GummiEffect" xml:space="preserve">
+    <value>Gummi Effect</value>
+  </data>
+  <data name="pmdorand:effect/item/PerishSong" xml:space="preserve">
+    <value>Perish Song</value>
+  </data>
+
+  <data name="pmdorand:config/effect/item/HealthRestoration/flatDifference.title" xml:space="preserve">
+    <value>[color=#aaaaaa]Modify[color] &gt; Flat Difference</value>
+  </data>
+  <data name="pmdorand:config/effect/item/HealthRestoration/flatDifference.description" xml:space="preserve">
+    <value>When enabled, Max Difference becomes a flat number.[br][br](+- 20% becomes +- 0.2)</value>
+  </data>
+  <data name="pmdorand:config/effect/item/HealthRestoration/maxDifference.title" xml:space="preserve">
+    <value>[color=#aaaaaa]Modify[color] &gt; Max Difference</value>
+  </data>
+  <data name="pmdorand:config/effect/item/HealthRestoration/maxDifference.description" xml:space="preserve">
+    <value>How much positive or negative deviation healing effects are given.[br](20% means 80% - 120%)</value>
+  </data>
+  <data name="pmdorand:config/effect/item/HealthRestoration/appearanceSettings.title" xml:space="preserve">
+    <value>[color=#aaaaaa]Appearance[color] &gt; Appearance Settings</value>
+  </data>
+  <data name="pmdorand:config/effect/item/HealthRestoration/appearanceSettings.description" xml:space="preserve">
+    <value>Options specific to when the effect appears on a new item.</value>
+  </data>
+
   <data name="PMDOR_CHANGELOG_2025-03-23" xml:space="preserve">
     <value>
 Project code is now available on GitHub!

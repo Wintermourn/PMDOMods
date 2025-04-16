@@ -2,6 +2,7 @@ local rand = require 'pmdorand.lib.pseudorandom'
 local CONST = require 'pmdorand.lib.constants'
 	local ItemEventRule = CONST.Enums.ItemEventRule;
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
+local switch = require 'mentoolkit.lib.switchcaser'
 
 ---@class PMDOR.Data
 local data = {
@@ -197,6 +198,7 @@ local data = {
 				enabled = true,
 				priceMode = CONST.Enums.PriceMode.RANDOMOFFSET
 			},
+			---@type {enabled: boolean, [string]: PMDOR.ItemEvent.Config}
 			effects = {
 				enabled = true
 			}
@@ -310,13 +312,18 @@ local data = {
 		},
 		pokemon = {
 			evolutionMethods = {}
+		},
+		configs = {
+			itemEffects = {}
 		}
+	},
+	knownDirtiedMenus = {
+		itemEffects = true
 	}
 };
 local backup = require 'pmdorand.lib.deepcopy' .deepcopy(data.options);
 data.mod.header = RogueEssence.PathMod.GetModFromNamespace("pmdorand");
 data.mod.path = CONST.Classes.System.IO.Path.Combine(RogueEssence.PathMod.APP_PATH, data.mod.header.Path);
-
 
 local function hash(word)
 	local result = 5381
@@ -365,36 +372,151 @@ data.loadConfig = function (config)
 	data.options = require 'pmdorand.lib.table_merge' (require 'pmdorand.lib.deepcopy' .deepcopy(backup), config);
 end
 
-data.random = function (generator_index, min, max)
-	local gen = randomGenerators.flattened[generator_index];
-	if gen then
-		return gen:random(min, max);
+local configTemplateSwitch = switch {
+	---@param dat PMDOR.ConfigTemplate.Toggle
+	['toggle'] = function (dat)
+		return dat.default;
+	end,
+	---@param dat PMDOR.ConfigTemplate.Integer
+	['int'] = function (dat)
+		return dat.default;
+	end,
+	---@param dat PMDOR.ConfigTemplate.Number
+	['number'] = function (dat)
+		return dat.default
+	end,
+	---@param dat PMDOR.ConfigTemplate.Percentage
+	['percent'] = function (dat)
+		return dat.default;
+	end,
+	---@param dat PMDOR.ConfigTemplate.Table
+	['table'] = function (dat)
+		return require 'pmdorand.lib.deepcopy'.deepcopy (dat.value);
+	end,
+	---@param dat PMDOR.ConfigTemplate.String
+	['string'] = function (dat)
+		return dat.default;
 	end
-	return 0;
-end
+}
+---@param dat PMDOR.ConfigTemplate.Subtable
+---@diagnostic disable-next-line: inject-field
+function configTemplateSwitch.subtable (dat)
+	local result = {};
+	local value;
 
-data.randomPower = function (generator_index, min, max, center, power)
-	local gen = randomGenerators.flattened[generator_index];
-	if gen then
-		local range = max - min;
-		local normalCenter = (center - min)/range;
-		local rng = gen:random();
-
-		local skewed = rng^(1/power);
-
-		local mapped = skewed < normalCenter and (skewed / normalCenter) or ((skewed - normalCenter)/ (1-normalCenter));
-
-		return mapped * range + min;
+	for i,k in pairs(dat.value) do
+		if type(k) == 'table' then
+			value = configTemplateSwitch(k.type, k);
+			if value ~= nil then
+				result[k.id] = value;
+			else
+				result[i] = require 'pmdorand.lib.deepcopy' .deepcopy(k);
+			end
+		else
+			result[i] = k;
+		end
 	end
-	return 0;
+
+	return result;
 end
 
-data.randomizationChance = function (chance, randomizer)
-	if chance >= 1 then return true end
-	if chance <= 0 then return false end
-	return data.random(randomizer) < chance;
+---@param template PMDOR.ConfigTemplate
+function data.createConfigFromTemplate(template)
+	local result = {};
+	local value;
+
+	for i,k in pairs(template) do
+		if type(k) == 'table' then
+			value = configTemplateSwitch(k.type, k);
+			if value ~= nil then
+				result[k.id or i] = value;
+			else
+				result[i] = require 'pmdorand.lib.deepcopy' .deepcopy(k);
+			end
+		else
+			result[i] = k;
+		end
+	end
+
+	return result;
 end
 
+--#region numbergen
+	data.random = function (generator_index, min, max)
+		local gen = randomGenerators.flattened[generator_index];
+		if gen then
+			return gen:random(min, max);
+		end
+		return 0;
+	end
+
+	data.randomPower = function (generator_index, min, max, center, power)
+		local gen = randomGenerators.flattened[generator_index];
+		if gen then
+			local range = max - min;
+			local normalCenter = (center - min)/range;
+			local rng = gen:random();
+
+			local skewed = rng^(1/power);
+
+			local mapped = skewed < normalCenter and (skewed / normalCenter) or ((skewed - normalCenter)/ (1-normalCenter));
+
+			return mapped * range + min;
+		end
+		return 0;
+	end
+
+	data.randomizationChance = function (chance, randomizer)
+		if chance >= 1 then return true end
+		if chance <= 0 then return false end
+		return data.random(randomizer) < chance;
+	end
+
+	data.round = function (value)
+		return value % 1 > 0.5 and math.ceil(value) or math.floor(value);
+	end
+--#endregion numbergen
+--#region eventbus
+	data.AddEventCallback = function (event, fun)
+		if not data.eventbus.on[event] then data.eventbus.on[event] = {} end
+		data.eventbus.on[event][#data.eventbus.on[event]+1] = fun;
+	end
+	data.AddEventCallbackOnce = function (event, fun)
+		if not data.eventbus.once[event] then data.eventbus.once[event] = {} end
+		data.eventbus.once[event][#data.eventbus.once[event]+1] = fun;
+	end
+	data.RemoveEventCallback = function (event, fun)
+		if not data.eventbus.on[event] then return end
+		for i,k in pairs(data.eventbus.on[event]) do
+			if k == fun then
+				table.remove(data.eventbus.on[event], i);
+				return;
+			end
+		end
+	end
+	data.RemoveEventCallbackOnce = function (event, fun)
+		if not data.eventbus.once[event] then return end
+		for i,k in pairs(data.eventbus.once[event]) do
+			if k == fun then
+				table.remove(data.eventbus.once[event], i);
+				return;
+			end
+		end
+	end
+	data.FireEvent = function (event, ...)
+		if data.eventbus.once[event] then
+			for _,k in pairs(data.eventbus.once[event]) do
+				k(...)
+			end
+			data.eventbus.once[event] = {};
+		end
+		if data.eventbus.on[event] then
+			for _,k in pairs(data.eventbus.on[event]) do
+				k(...)
+			end
+		end
+	end
+--#endregion eventbus
 data.typeBlacklist = function (cache, blacklist)
 	local output = {};
 	local realBlacklist = {};
@@ -410,7 +532,10 @@ data.typeBlacklist = function (cache, blacklist)
 end
 
 data.language = {};
-data.language.toggle = function (bool)
+data.language.toggle = function (bool, fadeBool)
+	if fadeBool == false then
+		return bool and STRINGS:FormatKey("pmdorand:option.enabled.fade") or STRINGS:FormatKey("pmdorand:option.disabled.fade")
+	end
 	return bool and STRINGS:FormatKey("pmdorand:option.enabled") or STRINGS:FormatKey("pmdorand:option.disabled");
 end
 data.language.descriptionText = function (key)
@@ -575,45 +700,6 @@ data.AddItemEffectData = function (key, options)
 	backup.items.effects[key] = backup.items.effects[key] or require 'pmdorand.lib.deepcopy' .deepcopy(options);
 end
 
-data.AddEventCallback = function (event, fun)
-	if not data.eventbus.on[event] then data.eventbus.on[event] = {} end
-	data.eventbus.on[event][#data.eventbus.on[event]+1] = fun;
-end
-data.AddEventCallbackOnce = function (event, fun)
-	if not data.eventbus.once[event] then data.eventbus.once[event] = {} end
-	data.eventbus.once[event][#data.eventbus.once[event]+1] = fun;
-end
-data.RemoveEventCallback = function (event, fun)
-	if not data.eventbus.on[event] then return end
-	for i,k in pairs(data.eventbus.on[event]) do
-		if k == fun then
-			table.remove(data.eventbus.on[event], i);
-			return;
-		end
-	end
-end
-data.RemoveEventCallbackOnce = function (event, fun)
-	if not data.eventbus.once[event] then return end
-	for i,k in pairs(data.eventbus.once[event]) do
-		if k == fun then
-			table.remove(data.eventbus.once[event], i);
-			return;
-		end
-	end
-end
-data.FireEvent = function (event, ...)
-	if data.eventbus.once[event] then
-		for _,k in pairs(data.eventbus.once[event]) do
-			k(...)
-		end
-		data.eventbus.once[event] = {};
-	end
-	if data.eventbus.on[event] then
-		for _,k in pairs(data.eventbus.on[event]) do
-			k(...)
-		end
-	end
-end
 
 local type_BattleEvent = luanet.ctype(RogueEssence.Dungeon.BattleEvent);
 local type_PromoteDetail = luanet.ctype(RogueEssence.Data.PromoteDetail);
@@ -621,9 +707,9 @@ local type_Type = luanet.ctype(CONST.Classes.System.Type);
 
 ---@generic options
 ---@param id string
----@param settings `options`
+---@param settings PMDOR.ConfigTemplate
 ---@param onItemRandomized fun(target: PMDOR.ItemEvent.Target, config: PMDOR.ItemEvent.Config<options>, data: PMDOR.Data)
----@return {onItemRandomized: function, options: options}?
+---@return {onItemRandomized: function, options: options, sortPriority: number|string?}?
 data.AddItemEffect = function (id, affectedCTypes, onItemRandomized, settings)
 	if type(affectedCTypes) ~= 'table' then return logger:err("AddItemEffect parameter affectedCTypes should be table") end
 	local o = {
@@ -639,6 +725,9 @@ data.AddItemEffect = function (id, affectedCTypes, onItemRandomized, settings)
 		end
 	end
 
+	data.external.configs.itemEffects[id] = data.external.configs.itemEffects[id] or settings;
+	local config = data.createConfigFromTemplate(settings);
+
 	o.__index = function (self, index)
 		if index == "options" then return data.options.items.effects[id]; end
 		return rawget(self, index);
@@ -649,7 +738,7 @@ data.AddItemEffect = function (id, affectedCTypes, onItemRandomized, settings)
 		appearanceRules = 0,
 		modifyRate = 1.0,
 		disappearanceChance = 0.0,
-		settings = settings
+		settings = config
 	});
 	setmetatable(o, o);
 
@@ -685,8 +774,5 @@ data.AddEvolutionMethod = function (evoClass, onEvoRandomized, settings)
 	end
 end
 
-data.round = function (value)
-	return value % 1 > 0.5 and math.ceil(value) or math.floor(value);
-end
 
 return data;

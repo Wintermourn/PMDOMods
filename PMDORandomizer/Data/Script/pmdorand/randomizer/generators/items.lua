@@ -2,7 +2,7 @@ local CONST = require 'pmdorand.lib.constants'
     local Environment = CONST.Classes.System.Environment;
     local ItemEventRule = CONST.Enums.ItemEventRule;
 local data = require 'pmdorand.randomizer.data'
-local switch = require 'pmdorand.lib.switchcaser'
+local switch = require 'mentoolkit.lib.switchcaser'
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND');
 
 local ucache = require 'pmdorand.randomizer.utilitycache'

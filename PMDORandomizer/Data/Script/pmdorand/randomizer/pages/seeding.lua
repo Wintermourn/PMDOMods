@@ -33,7 +33,7 @@ local function SeedMenuCallback(seed, callback)
         STRINGS:FormatKey("INPUT_CAN_PASTE"),
         130, seed, callback);
 
-    _MENU:AddMenu(menu, true);
+    _MENU:AddMenu(menu, false);
 end
 
 local function SeedMenu(button, path)
@@ -124,13 +124,13 @@ end
 
 return function()
     if seeding_menu == nil then
-        seeding_menu = paginated_menu(32,96,256,127);
+        seeding_menu = paginated_menu.create(32,96,256,127);
         seeding_menu.title = "Seeding"
         seeding_menu.onInput = menu_input;
 
         loose_seed_page = seeding_menu:AddPage();
 
-        loose_seed_page:AddHeader(STRINGS:FormatKey("pmdorand:seed.clear"))
+        loose_seed_page:AddHeader "[$pmdorand:seed.clear]"
         createSharedButton();
 
         loose_seed_page:AddSpacer(4);
@@ -141,7 +141,7 @@ return function()
 
         local second_page = seeding_menu:AddPage();
 
-        second_page:AddHeader("[color=#aaaaaa]Submenus");
+        second_page:AddHeader "[^gray]Submenus";
         second_page:AddSubmenuButton("Pokemon", CONST.FUNCTION_EMPTY);
         second_page:AddSubmenuButton("Dungeon", CONST.FUNCTION_EMPTY);
         second_page:AddSubmenuButton("Moves", CONST.FUNCTION_EMPTY);

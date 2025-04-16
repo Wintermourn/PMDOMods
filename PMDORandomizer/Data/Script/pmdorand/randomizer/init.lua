@@ -4,7 +4,6 @@ local CONST = require 'pmdorand.lib.constants'
     local perform = CONST.PERFORM_LATER;
 local data = require 'pmdorand.randomizer.data';
 
-local options_menu = require 'mentoolkit.menus.reflowing_options'
 local paginated_menu = require 'mentoolkit.menus.paginated_options'
 
 local randomizer = {
@@ -16,7 +15,7 @@ local topMenu;
 randomizer.OpenMenu = function ()
     local menu;
     if topMenu == nil then
-        topMenu = paginated_menu(8,8,220,131);
+        topMenu = paginated_menu.create(8,8,220,131);
         menu = topMenu;
         ---@cast menu mentoolkit.PaginatedOptions
         menu.title = "PMDO Randomizer ".. data.version;
@@ -25,11 +24,11 @@ randomizer.OpenMenu = function ()
 
         local frontPage = menu:AddPage();
 
-        frontPage:AddButton(STRINGS:FormatKey("pmdorand:wip"), require 'pmdorand.randomizer.pages.changelog')
+        frontPage:AddButton("[$pmdorand:wip]", require 'pmdorand.randomizer.pages.changelog')
             :SetLabel('center', data.lastModified)
             :SetLabel('right', data.version);
         frontPage:AddSpacer(6)
-        frontPage:AddText("[color=#a0a0a0]Currently Randomized?"):SetLabel('right', "[color=#ff3030]Not Tracked[color]");
+        frontPage:AddText("[^gray]Currently Randomized?"):SetLabel('right', "[color=#ff3030]Not Tracked[color]");
         --[[ menu:AddButton("\n", CONST.FUNCTION_EMPTY).labels = {
             left = "Enabled\n - no functionality",
             center = "test",
@@ -39,7 +38,7 @@ randomizer.OpenMenu = function ()
         randomize.labels.right = '';
         randomize.actions.onSelected = function ()
             if data.lockRandomizerButton then return end
-            randomize:SetLabel('right', '[color=#aaaaaa]working...');
+            randomize:SetLabel('right', '[^gray]working...');
             --- Run the randomizer as a coroutine. We don't want the game sitting there completely locked up.
             local c = coroutine.create(require 'pmdorand.randomizer.generators.run');
             data.updateCoroutine = c;
@@ -58,18 +57,18 @@ randomizer.OpenMenu = function ()
         end);
 
         local generationPage = topMenu:AddPage();
-        generationPage:AddHeader("[color=#aaaaaa]Generation");
-        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.seeding"), perform 'pmdorand.randomizer.pages.seeding');
-        generationPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.save"), perform 'pmdorand.randomizer.pages.saved_options');
+        generationPage:AddHeader("[^gray]Generation");
+        generationPage:AddSubmenuButton("[$pmdorand:top.seeding]", perform 'pmdorand.randomizer.pages.seeding');
+        generationPage:AddSubmenuButton("[$pmdorand:top.save]", perform 'pmdorand.randomizer.pages.saved_options');
 
         local optionsPage = topMenu:AddPage();
-        optionsPage:AddHeader("[color=#aaaaaa]Randomization Options");
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.pokemon"), perform 'pmdorand.randomizer.pages.pokemon');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.moves"), perform 'pmdorand.randomizer.pages.moves');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.items"), perform 'pmdorand.randomizer.pages.items');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.dungeons"), CONST.FUNCTION_EMPTY);
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.naming"), perform 'pmdorand.randomizer.pages.naming');
-        optionsPage:AddSubmenuButton(STRINGS:FormatKey("pmdorand:top.statuses"), perform 'pmdorand.randomizer.pages.statuses');
+        optionsPage:AddHeader("[^gray]Randomization Options");
+        optionsPage:AddSubmenuButton("[$pmdorand:top.pokemon]", perform 'pmdorand.randomizer.pages.pokemon');
+        optionsPage:AddSubmenuButton("[$pmdorand:top.moves]", perform 'pmdorand.randomizer.pages.moves');
+        optionsPage:AddSubmenuButton("[$pmdorand:top.items]", perform 'pmdorand.randomizer.pages.items');
+        optionsPage:AddSubmenuButton("[$pmdorand:top.dungeons]", CONST.FUNCTION_EMPTY);
+        optionsPage:AddSubmenuButton("[$pmdorand:top.naming]", perform 'pmdorand.randomizer.pages.naming');
+        optionsPage:AddSubmenuButton("[$pmdorand:top.statuses]", perform 'pmdorand.randomizer.pages.statuses');
 
         randomizer.menu.top = topMenu;
     else

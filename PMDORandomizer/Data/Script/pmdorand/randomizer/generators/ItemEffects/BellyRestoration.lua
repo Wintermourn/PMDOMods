@@ -2,7 +2,7 @@ local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAN
 
 local effect = require 'pmdorand.randomizer.data' .AddItemEffect(
     --- Effect Data name (this is stored in the save file)
-    "PPRestoration",
+    "BellyRestoration",
     --- Related Events - the function below is fired whenever one of these events is found inside of an item
     {
     },

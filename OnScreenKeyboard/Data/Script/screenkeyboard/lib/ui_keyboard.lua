@@ -33,7 +33,8 @@ local keystackEntry = {
     customKeyboards = {},
     ---@type screenkeyboard.Keyboard
     currentKeyboard = defaultKeyboard,
-    __keyboardScroll = 0
+    __keyboardScroll = 0,
+    initialContents = ''
 }
 keystackEntry.__index = keystackEntry;
 
@@ -83,7 +84,6 @@ local keyboard = {
             label = "[$screenkeyboard:keyboard/end]",
             ---@param entry screenkeyboard.KeyboardStackEntry
             action = function (entry, input)
-                _MENU:RemoveMenu();
                 if entry.isCMenu then
                     entry.ref:GetType():GetMethod("Confirmed", array_NonPublic_Instance):Invoke(entry.ref, array_Object_Empty);
                 elseif entry.isScriptedMenu then
@@ -101,6 +101,14 @@ local function getKeyboardLabel(keyboard, comparedKeyboard)
         return tag.parse(comparedKeyboard == keyboard and keyboard.label.selected or keyboard.label.default);
     end
     return '';
+end
+
+local function queryClosedMenu(topLayerMenu)
+    if keyboardStack[1] == nil then return end
+    if topLayerMenu == keyboardStack[#keyboardStack].ref then
+        keyboardStack[#keyboardStack] = nil;
+        _MENU:RemoveMenu();
+    end
 end
 
 ---@param board screenkeyboard.Keyboard
@@ -134,9 +142,11 @@ local function addToKeyboardStack(reference, keyboards)
         ref = reference,
         isCMenu = isC,
         isScriptedMenu = not isC,
+        ---@type unknown
         textEntryObject = nil,
         coordinates = {x=0,y=0},
-        customKeyboards = keyboards or {}
+        customKeyboards = keyboards or {},
+        initialContents = ''
     }
 
     if entry.isScriptedMenu then
@@ -150,6 +160,8 @@ local function addToKeyboardStack(reference, keyboards)
     else
         entry.textEntryObject = reference.Text;
     end
+    entry.initialContents = entry.textEntryObject and entry.textEntryObject.Text or '';
+    logger:debug("contents: '",entry.initialContents);
 
     setmetatable(entry, keystackEntry);
     keyboardStack[#keyboardStack+1] = entry;
@@ -233,7 +245,30 @@ keyboard.sidebar[3].action = function (entry)
     end
 end
 
+---@param stackEntry  screenkeyboard.KeyboardStackEntry
+local function cancelInput (stackEntry, input)
+    if stackEntry.isCMenu then
+        stackEntry.ref:GetType():GetMethod("Canceled", array_NonPublic_Instance):Invoke(stackEntry.ref, array_Object_Empty);
+    else
+        stackEntry.ref:Update(input);
+        -- * TODO
+    end
+end
+
+---@param stackEntry  screenkeyboard.KeyboardStackEntry
+local function cancelInputCallback (stackEntry, input)
+    return function ()
+        if stackEntry.isCMenu then
+            stackEntry.ref:GetType():GetMethod("Canceled", array_NonPublic_Instance):Invoke(stackEntry.ref, array_Object_Empty);
+        else
+            stackEntry.ref:Update(input);
+            -- * TODO
+        end
+    end
+end
+
 local keyboardKey;
+local confirmation;
 
 local inputSwitch = switch {
     ---@param stackEntry screenkeyboard.KeyboardStackEntry
@@ -262,10 +297,18 @@ local inputSwitch = switch {
         _GAME:SE("Menu/Speak");
         keyboard.cursor:ResetTimeOffset();
     end,
-    [CONST.Enums.Keys.Escape] = function ()
-        _MENU:RemoveMenu();
-        _MENU:RemoveMenu();
-        keyboardStack[#keyboardStack] = nil;
+    ---@param stackEntry screenkeyboard.KeyboardStackEntry
+    [CONST.Enums.Keys.Escape] = function (stackEntry, input)
+        if stackEntry.textEntryObject and stackEntry.textEntryObject.Text ~= stackEntry.initialContents then
+            confirmation = _MENU:CreateQuestion(
+                STRINGS:FormatKey("screenkeyboard:cancel"),
+                cancelInputCallback(stackEntry, input),
+                CONST.FUNCTION_EMPTY
+            );
+            _MENU:AddMenu(confirmation, false);
+        else
+            cancelInput(stackEntry, input);
+        end
     end,
     [CONST.Enums.Keys.Backspace] = keyboard.sidebar[5].action,
     [CONST.Enums.Keys.Space] = function (stackEntry)
@@ -362,7 +405,7 @@ local keyboard_input = function (i)
         end
     end
 
-    if i:BaseKeyPressed(CONST.Enums.Keys.Escape) then
+    if i:JustPressed(RogueEssence.FrameInput.InputType.Cancel) or i:BaseKeyPressed(CONST.Enums.Keys.Escape) then
         inputSwitch(CONST.Enums.Keys.Escape, topOfStack, i);
         return;
     end
@@ -470,5 +513,6 @@ keyboard.__menu.Elements:Add(keyboard.cursor);
 
 return {
     DetectKeyboardable = detectForKeyboard,
-    AddToStack = addToKeyboardStack
+    AddToStack = addToKeyboardStack,
+    QueryClosure = queryClosedMenu
 }

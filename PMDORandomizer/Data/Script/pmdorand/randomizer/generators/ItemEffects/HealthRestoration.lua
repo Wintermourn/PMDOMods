@@ -1,6 +1,6 @@
 local logger = require 'mentoolkit.lib.logger' ('wintermourn.pmdorand', 'PMDORAND')
 
-require 'pmdorand.randomizer.data' .AddItemEffect(
+local effect = require 'pmdorand.randomizer.data' .AddItemEffect(
     --- Effect Data name (this is stored in the save file)
     "HealthRestoration",
     --- Related Events - the function below is fired whenever one of these events is found inside of an item
@@ -46,12 +46,55 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
     end,
     --- Effect config data (these are stored in the save file and can be accessed by the function above)
     {
-        flatDifference = false,
-        maxDifference = 0.2,
-        appearanceSettings = {
-            maxRestorePercentage        = 0.5,
-            restoreLeaningPercentage    = 0.2,
-            restoreLeaningStrength      = 2.00
+        ---@type PMDOR.ConfigTemplate.Toggle
+        {
+            id = 'flatDifference',
+            type = 'toggle',
+            default = false
+        },
+        ---@type PMDOR.ConfigTemplate.Percentage
+        {
+            id = 'maxDifference',
+            type = 'percent',
+            default = 0.2,
+            minValue = 0,
+            maxValue = 9e9,
+            stepSize = 0.01
+        },
+        ---@type PMDOR.ConfigTemplate.Subtable
+        {
+            id = 'appearanceSettings',
+            type = 'subtable',
+            value = {
+                ---@type PMDOR.ConfigTemplate.Percentage
+                {
+                    id = 'maxRestorePercentage',
+                    type = 'percent',
+                    default = 0.5,
+                    stepSize = 0.01,
+                    minValue = 0,
+                    maxValue = 1
+                },
+                ---@type PMDOR.ConfigTemplate.Percentage
+                {
+                    id = 'restoreLeaningPercentage',
+                    type = 'percent',
+                    default = 0.2,
+                    stepSize = 0.01,
+                    minValue = 0,
+                    maxValue = 1
+                },
+                ---@type PMDOR.ConfigTemplate.Number
+                {
+                    id = 'restoreLeaningStrength',
+                    type = 'number',
+                    default = 2.00,
+                    stepSize = 0.1,
+                    minValue = 0,
+                    maxValue = 1
+                }
+            }
         }
     }
 )
+effect.sortPriority = -128;

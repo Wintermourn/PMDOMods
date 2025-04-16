@@ -79,4 +79,7 @@
   <data name="screenkeyboard:keyboard/end" xml:space="preserve">
     <value>END</value>
   </data>
+  <data name="screenkeyboard:cancel" xml:space="preserve">
+    <value>Are you sure you want to cancel? If it succeeds, anything you've input will be lost.</value>
+  </data>
 </root>

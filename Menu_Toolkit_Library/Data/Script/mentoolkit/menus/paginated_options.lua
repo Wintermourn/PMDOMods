@@ -2,7 +2,7 @@ local CONST = require 'mentoolkit.lib.constants'
     local Dir8 = CONST.Enums.Dir8;
     local DirH = CONST.Enums.DirH;
 
----@class mentoolkit.PaginatedOptions
+---@class mentoolkit.PaginatedOptions : mentoolkit.Menu
 ---@field onInput fun(menu: mentoolkit.PaginatedOptions,input: unknown): boolean Input Event. Return value cancels the default inputs (besides menu close).
 local paginated_options_menu = {
     ---Handle with care!!<br>The RogueEssence Menu object.
@@ -32,7 +32,8 @@ local paginated_options_menu = {
     --- Description box data, handled by the menu automatically.
     __description = {
         menu = nil, title = '', description = ''
-    }
+    },
+    actions = {}
 }
 paginated_options_menu.__index = paginated_options_menu;
 
@@ -91,7 +92,7 @@ function paginated_options_menu:Rebuild ()
     if self.title then
         if not self.__cache.hasTitle then
             self.__cache.hasTitle = true;
-            self.__cache.globalElements.title = CONST.Functions.Menu.CreateText(self.title, 10, 8);
+            self.__cache.globalElements.title = CONST.Functions.Menu.CreateText(require 'mentoolkit.lib.tag_reader' .parse(self.title), 10, 8);
             self.__cache.globalElements.divider = RogueEssence.Menu.MenuDivider(RogueElements.Loc(10,21), mw- 20);
         end
         if self.showPageNumber then
@@ -173,9 +174,9 @@ function paginated_options_menu:Open (rebuild)
         end
     end
 
-    if self.__description.menu then
+    --[[ if self.__description.menu then
         _MENU:AddMenu(self.__description.menu, true);
-    end
+    end ]]
     _MENU:AddMenu(self.__menu, true);
 end
 
@@ -187,20 +188,16 @@ end
 ---@return nil
 function paginated_options_menu:AddDescriptionPanel(x,y,w,h)
     if self.__description.menu then return self.__description.menu; end
-    self.__description.menu = RogueEssence.Menu.ScriptableMenu(x,y,w,h, function(i)
-        if i:JustPressed(RogueEssence.FrameInput.InputType.Cancel) or i:JustPressed(RogueEssence.FrameInput.InputType.Menu) then
-            _GAME:SE("Menu/Cancel");
-            _MENU:RemoveMenu();
-            return;
-        end
-    end);
+    self.__description.menu = RogueEssence.Menu.SummaryMenu(RogueElements.Rect(x,y,w,h));
     self.__description.titleObject = CONST.Functions.Menu.CreateText('', 10, 8);
-    self.__description.descriptionObject = RogueEssence.Menu.DialogueText('', RogueElements.Rect(10, 25,w-16,h-33), 13);
+    self.__description.descriptionObject = RogueEssence.Menu.DialogueText('', RogueElements.Rect(10, 25,w-20,h-33), 13);
 ---@diagnostic disable-next-line: undefined-field
     local entries = self.__description.menu.Elements;
     entries:Add(self.__description.titleObject);
     entries:Add(RogueEssence.Menu.MenuDivider(RogueElements.Loc(10,21), w - 20));
     entries:Add(self.__description.descriptionObject);
+
+    self.__menu.SummaryMenus:Add(self.__description.menu);
 end
 
 --- Sets the text contained in the description box if it exists.<br>
@@ -209,8 +206,13 @@ end
 ---@param description any
 function paginated_options_menu:SetDescription(title, description)
     if not self.__description.menu then return end
-    self.__description.titleObject:SetText(title);
-    self.__description.descriptionObject:SetAndFormatText(description);
+    self.__description.titleObject:SetText(require 'mentoolkit.lib.tag_reader' .parse(title));
+    self.__description.descriptionObject:SetAndFormatText(require 'mentoolkit.lib.tag_reader' .parse(description));
+end
+
+---@overload fun(self: mentoolkit.PaginatedOptions, event: 'onClose', fun: fun(self: mentoolkit.PaginatedOptions))
+function paginated_options_menu:SetCallback(event, fun)
+    self.actions[event] = fun;
 end
 
 --- Adds a new page to the end of the current menu.
@@ -344,7 +346,7 @@ end
 ---@param text string
 ---@return mentoolkit.PaginatedOptions.Labelled
 function labelled:SetLabel(label, text)
-    text = text:gsub("%[br%]",'\n');
+    text = require 'mentoolkit.lib.tag_reader' .parse(text):gsub("%[br%]",'\n');
     if label == 'left' then
         if self.__menuElements.label_left then
             self.__menuElements.label_left:SetText(text);
@@ -402,10 +404,13 @@ end
 local inputs = {
     ['close'] = function (menu, playSound)
         if playSound then _GAME:SE("Menu/Cancel"); end
-        if menu.__description.menu then
+        --[[ if menu.__description.menu then
             _MENU:RemoveMenu();
-        end
+        end ]]
         _MENU:RemoveMenu();
+        if menu.actions.onClose then
+            menu.actions.onClose(menu);
+        end
     end,
     ['confirm'] = function (menu, playSound)
         local options = menu.pages[menu.currentPage].contents;
@@ -456,6 +461,9 @@ local inputs = {
         end
         if playSound then _GAME:SE("Menu/Select"); end
 
+        if options[menu.currentSelection].description then
+            menu:SetDescription(options[menu.currentSelection].description.title, options[menu.currentSelection].description.content);
+        end
         menu.pages[menu.currentPage]:Refresh();
         menu:Rebuild();
 
@@ -472,6 +480,9 @@ local inputs = {
         end
         if playSound then _GAME:SE("Menu/Select"); end
 
+        if options[menu.currentSelection].description then
+            menu:SetDescription(options[menu.currentSelection].description.title, options[menu.currentSelection].description.content);
+        end
         menu.pages[menu.currentPage]:Refresh();
         menu:Rebuild();
 
@@ -522,9 +533,10 @@ end
 ---@param w integer Menu Width
 ---@param h integer Menu Height
 ---@return mentoolkit.PaginatedOptions
-return function(x, y, w, h)
+local createMenu = function(x, y, w, h)
     local o = {
-        pages = {}, elements = {}, __cache = {hasTitle = false, globalElements = {}}, __description = {menu = nil, title = '', content = ''}
+        pages = {}, elements = {}, __cache = {hasTitle = false, globalElements = {}}, __description = {menu = nil, title = '', content = ''},
+        actions = {}
     };
     o.__menu = RogueEssence.Menu.ScriptableMenu(x,y,w,h, function(i) controls_listener(o, i) end);
     o.cursor = RogueEssence.Menu.MenuCursor(o.__menu);
@@ -532,3 +544,12 @@ return function(x, y, w, h)
     setmetatable(o, paginated_options_menu);
     return o
 end
+
+return {
+    create = createMenu,
+    __metatables = {
+        menu = paginated_options_menu,
+        page = options_page,
+        element = labelled
+    }
+}

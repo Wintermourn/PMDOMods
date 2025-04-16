@@ -151,20 +151,61 @@ local function fill_save_menu()
     page:AddHeader("[color=#aaaaaa]Shared Sets");
 
     files = __Directory.GetFiles(CONFIGFOLDER_SHARED);
-    sortedFiles = {};
-    for i = 0, files.Length - 1 do
-        sortedFiles[#sortedFiles+1] = {path = files[i], lastModified = __File.GetLastWriteTime(files[i])};
+
+    if files.Length > 0 then
+        sortedFiles = {};
+        for i = 0, files.Length - 1 do
+            sortedFiles[#sortedFiles+1] = {path = files[i], lastModified = __File.GetLastWriteTime(files[i])};
+        end
+        table.sort(sortedFiles, function (a, b)
+            return a.lastModified:CompareTo(b.lastModified) > 0;
+        end)
+    
+        f = 1;
+        local author;
+        while (f <= #sortedFiles) do
+            local path = sortedFiles[f].path;
+    
+            page = saves.pages[#saves.pages];
+            if #page.contents > 11 then
+                page = saves:AddPage();
+                page:AddHeader("[color=#aaaaaa]Shared Sets");
+            end
+    
+            lineCount = 0;
+            name, version, author = "- unnamed -", "???", nil;
+            for line in io.lines(path, 'l') do
+                if string.sub(line, 1,7) == "name = " then
+                    name = string.sub(line, 9, -2);
+                end
+                if string.sub(line, 1,10) == "version = " then
+                    version = string.sub(line, 12, -2);
+                end
+                if string.sub(line, 1,9) == "author = " then
+                    author = string.sub(line, 11, -2);
+                end
+    
+                lineCount = lineCount + 1;
+                if lineCount == 2 then break end
+            end
+            if path:sub(-5) ~= '.json' then name = '[color=#ffaaaa]' .. name; end
+            page:AddButton(name, function ()
+                ctx_Data.filename = path;
+                ctx_Data.local_save = true;
+                context:Open(false);
+            end):SetLabel('right', author or version or '[color=#aaaaaa]Invalid Ver.');
+            f = f + 1;
+        end
+    else
+        page:AddButton("[color=#444444]No entries", CONST.FUNCTION_EMPTY);
     end
-    table.sort(sortedFiles, function (a, b)
-        return a.lastModified:CompareTo(b.lastModified) > 0;
-    end)
 end
 
 m.fill_save_menu = fill_save_menu;
 
 return function()
     if context == nil then
-        context = paginated_menu(224,103, 96, 92);
+        context = paginated_menu.create(224,103, 96, 92);
         local page = context:AddPage();
         page:AddButton("Load", function ()
             local file = io.open(ctx_Data.filename, 'r');
@@ -204,7 +245,7 @@ return function()
             _MENU:RemoveMenu();
         end);
 
-        saves = paginated_menu(0,0,255,188);
+        saves = paginated_menu.create(0,0,255,188);
         saves.title = "Saved Configurations";
         page = saves:AddPage();
     end

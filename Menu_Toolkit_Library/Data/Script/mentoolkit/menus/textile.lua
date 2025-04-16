@@ -3,7 +3,7 @@ local CONST = require 'mentoolkit.lib.constants'
     local DirH = CONST.Enums.DirH;
     local DirV = CONST.Enums.DirV;
 
----@class mentoolkit.Textile
+---@class mentoolkit.Textile : mentoolkit.Menu
 ---Menu type for text and visuals- no checks for buttons, only pages of text.
 local textile_menu = {
     ---Handle with care!!<br>The RogueEssence Menu object.
@@ -20,7 +20,7 @@ local textile_menu = {
     scroll = 0,
     canScrollMore = false,
     currentPage = 1,
-    ---@type mentoolkit.Textile.Page
+    ---@type mentoolkit.Textile.Page[]
     pages = {},
     ---Additional `IMenuElement`s to be added and kept when rebuilding the menu.
     global_elements = {}
@@ -201,7 +201,7 @@ local controls_listener = function (menu, input)
 end
 
 ---@return mentoolkit.Textile
-return function(x, y, w, h)
+local createMenu = function(x, y, w, h)
     local o = {
         pages = {}, global_elements = {}, currentPage = 1, __cache = {tick = 0}, scroll = 0, title = nil
     };
@@ -210,3 +210,11 @@ return function(x, y, w, h)
     setmetatable(o, textile_menu);
     return o
 end
+
+return {
+    create = createMenu,
+    __metatables = {
+        menu = textile_menu,
+        page = textile_page
+    }
+}

@@ -256,6 +256,7 @@ local controls_listener = function (menu, input)
     end
 end
 
+---@deprecated
 ---@return mentoolkit.Options
 return function(x, y, w, h)
     local o = {

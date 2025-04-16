@@ -13,7 +13,7 @@ Currently has some additional inputs for controllers:
     - Currently partial (checks for element with label `TEXT_ENTRY`)
 - [ ] Support non-matching menu types
     - maybe have `screenkeyboard.RegisterMenu(menu, input)`?
-- [ ] Stop keyboard from closing when the input menu refuses to close (e.g. blank input in team name entry)
+- [X] Stop keyboard from closing when the input menu refuses to close (e.g. blank input in team name entry)
 - [ ] Option to auto close/open whenever keyboard key/gamepad button is pressed
     - Likely not possible without some global input event (or maybe just have an invisible/offscreen menu to pass input through?)
 - [ ] Support PMD's keyboard inputs

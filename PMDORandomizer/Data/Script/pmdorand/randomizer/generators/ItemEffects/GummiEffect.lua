@@ -8,7 +8,19 @@ require 'pmdorand.randomizer.data' .AddItemEffect(
     end,
     {
         --- Chance for gummi effects to apply to base types only (denies effects that change a pokemon's typing!)
-        baseTypeRequirementRate = 0.0,
-        fullEffectRate = 0.0
+        ---@type PMDOR.ConfigTemplate.Percentage
+        {
+            id = 'baseTypeRequirementRate',
+            type = 'percent',
+            default = 0.00,
+            stepSize = 0.01
+        },
+        ---@type PMDOR.ConfigTemplate.Percentage
+        {
+            id = 'fullEffectRate',
+            type = 'percent',
+            default = 0.00,
+            stepSize = 0.01
+        }
     }
 )
