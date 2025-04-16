@@ -185,6 +185,12 @@
   <data name="pmdorand:save.name.title" xml:space="preserve">
     <value>Choose a name.</value>
   </data>
+  <data name="mentoolkit:description/randomize/itemeffects.title" xml:space="preserve">
+    <value>Randomize</value>
+  </data>
+  <data name="mentoolkit:description/randomize/itemeffects.description" xml:space="preserve">
+    <value>Allows item effects to be changed!</value>
+  </data>
   <data name="mentoolkit:description/randomize/itemeffect.title" xml:space="preserve">
     <value>Randomize</value>
   </data>
@@ -212,6 +218,9 @@
   <data name="pmdorand:effect/item/HealthRestoration" xml:space="preserve">
     <value>Health Restoration</value>
   </data>
+  <data name="pmdorand:effect/item/HealthRestoration.description" xml:space="preserve">
+    <value>Add health recovery to random items, change it on others... or take it away.</value>
+  </data>
   <data name="pmdorand:effect/item/PPRestoration" xml:space="preserve">
     <value>PP Restoration</value>
   </data>
@@ -223,6 +232,9 @@
   </data>
   <data name="pmdorand:effect/item/PerishSong" xml:space="preserve">
     <value>Perish Song</value>
+  </data>
+  <data name="pmdorand:effect/item/PerishSong.description" xml:space="preserve">
+    <value>Be wary! Some items might have a run-ending effect if used too often...</value>
   </data>
 
   <data name="pmdorand:config/effect/item/HealthRestoration/flatDifference.title" xml:space="preserve">

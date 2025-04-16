@@ -80,6 +80,7 @@ local function openConfigList()
     if item_effects_list and not data.knownDirtiedMenus.itemEffects then return item_effects_list:Open(true); end
     local menu = options_menu.create(32,32,220,115);
     menu.title = "[^gray][$pmdorand:title/items][color] > [$pmdorand:subtitle/itemeffects]";
+    menu:AddDescriptionPanel(0,185,320,55);
 
     local entries = {};
     for id, k in pairs(data.external.items.itemEffects) do
@@ -107,17 +108,19 @@ local function openConfigList()
         data.options.items.effects.enabled = not data.options.items.effects.enabled;
         self:SetLabel('right', data.language.toggle(data.options.items.effects.enabled));
         page:Refresh();
-    end):SetLabel('right', data.language.toggle(data.options.items.effects.enabled));
+    end):SetLabel('right', data.language.toggle(data.options.items.effects.enabled))
+        :SetDescription(data.language.descriptionText "mentoolkit:description/randomize/itemeffects");
 
     page:AddSpacer(5);
 
     local buttons = 1;
+    local hasTLName, hasTLDesc;
     for _,ido in ipairs(entries) do
         local id = ido.value;
         local k = data.external.items.itemEffects[id];
         if buttons > 5 then page = menu:AddPage(); buttons = 0; end
 
-        page:AddButton((data.options.items.effects.enabled and '' or '[^gray]')..string.format('[$pmdorand:effect/item/%s]', id), function ()
+        local button = page:AddButton((data.options.items.effects.enabled and '' or '[^gray]')..string.format('[$pmdorand:effect/item/%s]', id), function ()
             openConfigMenu(id, data.external.configs.itemEffects[id]):SetCallback('onClose', function ()
                 menu.pages[menu.currentPage]:Refresh();
             end);
@@ -126,6 +129,13 @@ local function openConfigList()
                 self:SetLabel('left', (data.options.items.effects.enabled and '' or '[^gray]')..string.format('[$pmdorand:effect/item/%s]', id));
                 self:SetLabel('right', data.language.toggle(k.options.enabled, data.options.items.effects.enabled) ..'[color] >');
             end);
+
+        hasTLName = RogueEssence.Text.Strings:ContainsKey(string.format("pmdorand:effect/item/%s.name", id));
+        hasTLDesc = RogueEssence.Text.Strings:ContainsKey(string.format("pmdorand:effect/item/%s.description", id));
+        button:SetDescription(
+            hasTLName and string.format('[$pmdorand:effect/item/%s.name]', id) or string.format('[$pmdorand:effect/item/%s]', id),
+            hasTLDesc and string.format('[$pmdorand:effect/item/%s.description]', id) or ''
+        );
         buttons = buttons + 1;
     end
 
