@@ -7,6 +7,11 @@ local tagRegex = __Regex_constructor:Invoke(luanet.make_array(
 ));
 local switch = require 'screenkeyboard.lib.switchcaser';
 
+--[[
+Supported Tag shortcuts:
+    [$key] - translation tags
+    [^red] - named colors
+]]
 local colors = {
     ['white'] = "[color=#ffffff]",
     ['red'] = "[color=#ff0000]",

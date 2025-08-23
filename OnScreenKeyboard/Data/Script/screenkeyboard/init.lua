@@ -5,6 +5,7 @@ local ScreenKeyboard = {
 local createKeyboard = require 'screenkeyboard.lib.create_keyboard';
 
 ScreenKeyboard.keyboards.previousEntries = nil;
+-- Keyboard labels/names use some custom tags (written inside "lib/tag_reader.lua") for shortcuts.
 ScreenKeyboard.keyboards.alphanumeric = createKeyboard('[$screenkeyboard:keyboard/alphanumeric]','[color=#00aaff][$screenkeyboard:keyboard/alphanumeric]', {
     "abcdefghijklm¡!",
     "nopqrstuvwxyz¿?",

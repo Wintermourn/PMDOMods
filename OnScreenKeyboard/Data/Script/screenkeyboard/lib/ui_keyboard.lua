@@ -61,7 +61,7 @@ local keyboard = {
         {
             isTypeMode = true,
             label = "[$screenkeyboard:type/over]",
-            action = nil
+            action = function() end
         },
         {
             isDelete = true,
